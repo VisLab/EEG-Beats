@@ -142,6 +142,7 @@ end
     %       result = notFeasible(firstBeat, innerBeat, lastBeat)
     %%
         
+        % innerBeat is either the firstBeat or lastBeat. 
         if innerBeat == 1 || innerBeat == (lastBeat-firstBeat+1)
             result = 1;
             return;
@@ -183,7 +184,7 @@ end
  
     end
 
-    function [idx] = initialParseIBI(signal, eps)
+    function [idx] = initialParseIBI(signal)
     %% Find a small number of suspected R peaks throughout the signal.
     %
     %   Parameters: 
@@ -194,7 +195,7 @@ end
     %       idx = initialParseIBI(signal)
     %%
         a = min(signal)*.15; 
-        index = find((signal - a) < 20 & signal > (a-1)); %handlful of R peaks 
+        index = find((signal - a) < 20 & signal > (a-1)); %handful of R peaks 
         b = 1;
         for i = 1:(length(index)+1)
             if i < (length(index) +1)
