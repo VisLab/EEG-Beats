@@ -65,6 +65,6 @@ ptUnmatched = setdiff(allIndices, brMatched);
  IBIsec = IBI/200; %convert them to seconds
  
  %% Add the headers and concatinate
-ibi = vertcat(IBI', IBIsec');
+ibi = horzcat(IBI', IBIsec');
 end
 

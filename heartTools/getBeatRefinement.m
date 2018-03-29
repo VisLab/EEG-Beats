@@ -37,7 +37,7 @@ function [peaksFinal] = getBeatRefinement(ekg, t, srate, below, above)
 
 % Use initialParseIBI to find a preliminary estimate of the peaks. 
 eps = 20; %(.10 * 200), QRS duration * sample rate
-idx = initialParseIBI(ekg, eps);
+idx = initialParseIBI(ekg);
 
 maxDist = round(above*srate);
 minDist = round(below*srate);

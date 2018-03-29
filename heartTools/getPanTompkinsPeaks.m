@@ -122,7 +122,7 @@ end
 
 
 if nargin < 3
-    gr = 1;   % on default the function always plots
+    gr = 0;   % on default the function doesnt plot
 end
 ecg = ecg(:); % vectorize
 
@@ -152,12 +152,11 @@ ax = zeros(1,6);
 
 
 
-figure;
 
 %% Noise cancelation(Filtering) % Filters (Filter in between 5-15 Hz)
 if fs == 200
 %% start figure
-   ax(1) = subplot(321);plot(ecg);axis tight;title('Raw signal');
+   %ax(1) = subplot(321);plot(ecg);axis tight;title('Raw signal');
 %% remove the mean of Signal
   ecg = ecg - mean(ecg);
 %% Low Pass Filter  H(z) = ((1 - z^(-6))^2)/(1 - z^(-1))^2
