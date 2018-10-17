@@ -1,6 +1,6 @@
 function [ ibi, brMatched, brUnmatched, ptUnmatched ] = findConsecutiveRR( brPeaks, ptPeaks )
 %% Determine which of the refined R peaks are consecutive 
-%   findConsecutiveBeats finds with R peaks found are consecutive and tests
+%   findConsecutiveBeats finds whith R peaks found are consecutive and tests
 %   how many of our peaks matched the PanTompkins algorithm's peaks. 
 %
 % Parameters:
@@ -32,7 +32,7 @@ margin = 5;
 %% Match common peaks
 while myP <= length(brPeaks) && theirP <= length(ptPeaks)
    if brPeaks(myP) < (ptPeaks(theirP) - margin)
-      %Our sample is too far to the left, move it to the right. 
+      % Our sample is too far to the left, move it to the right. 
        myP  = myP + 1;
    elseif ptPeaks(theirP) - margin <= brPeaks(myP) && ...
            brPeaks(myP) <= ptPeaks(theirP) + margin 

@@ -134,7 +134,7 @@ nois_c =[];
 nois_i =[];
 delay = 0;
 skip = 0; % becomes one when a T wave is detected
-not_nois = 0; % it is not noise when not_nois = 1
+not_nois = 0; % it is not noise when not_noise = 1
 selected_RR =[]; % Selected RR intervals
 m_selected_RR = 0;
 mean_RR = 0;
