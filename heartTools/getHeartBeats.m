@@ -1,26 +1,13 @@
- function [ ibi, brMatched, brUnmatched, ptUnmatched, brPeaksIdx, brPeaksTm, ptPeaksIdx ] = getHeartBeats( EEG )
+ function [ brPeaksIdx, brPeaksTm ] = getHeartBeats( EEG )
 %GETHEARTBEATS Find heartbeats within a signal.
 %   Find heart beats within a single channel and compare the result with the
 %   Pan-Tompkins QRS Detection algorithm.
 %
 %   Parameters:
 %       EEG     The EEG struct from EEGLab.
-%       ibi     (output) A two column array containing the time the R peak
-%               occured and the beat inervals in seconds. 
-%       brMatched
-%               (output) The heart beats detected using the Beat Refinement
-%               algorithm that were matched with the Pan-Tompkin algorithm.
-%       brUnmatched
-%               (output) The heart beats detected using the Beat Refinement
-%               algorithm that were not matched with the Pan-Tompkins
-%               algorithm. 
-%       ptUnmatched
-%               (output) The heart beats detected using the Pan-Tompkins
-%               algorithm that were not matched with the Beat Refinement
-%               algorithm. 
 %       brPeaks
 %               the peaks Brenda's algorithm finds with respect to time
-%       ptPeaksIdx
+%       brPeaksTm
 %               the peaks Pan-Tompkins finds with respect to the index
 %
 %   Example:
@@ -37,13 +24,15 @@ t = (t-1)/EEG.srate;
 below = 0.5;
 above = 1.5;
 qrsDuration = 0.1;
+consensusIntervalLen = 1;
 
 %Find R peaks using the Beat Refinment and Pan-Tompkins algorithms
-[brPeaksIdx, brPeaksTm] = getBeatRefinement(EEG.data, t, EEG.srate, below, above, qrsDuration);
-[~,ptPeaksIdx,~] = getPanTompkinsPeaks(double(EEG.data),EEG.srate,0);
+[brPeaksIdx, brPeaksTm] = getBeatRefinement(EEG.data, t, EEG.srate, below,...
+    above, qrsDuration, consensusIntervalLen);
+%[~,ptPeaksIdx,~] = getPanTompkinsPeaks(double(EEG.data),EEG.srate,0);
 
 %Compare algorithms and find IBI values
-[ ibi, brMatched, brUnmatched, ptUnmatched ] = findConsecutiveRR( brPeaksIdx, ptPeaksIdx );
+%[ ibi, brMatched, brUnmatched, ptUnmatched ] = findConsecutiveRR( brPeaksIdx, ptPeaksIdx );
 
 
 end

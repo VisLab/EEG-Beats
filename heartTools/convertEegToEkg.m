@@ -3,7 +3,7 @@
 %   loadPath        the path to load the data from
 %   saveDir         the directory to load the data to.
 %%
-function convertEegToEkg(loadPath, saveDir)
+function convertEegToEkg(loadPath, saveDir, minSrate)
     % Create the directory if it does not exist
     if ~mkdir(saveDir)
         print('Invalid save directory');
@@ -22,7 +22,7 @@ function convertEegToEkg(loadPath, saveDir)
                 continue;
             end
             eeg = pop_loadset([loadPath filesep filename(i).name]);
-            eeg = getEkgFromEeg(eeg, 128);
+            eeg = getEkgFromEeg(eeg, minSrate);
             pop_saveset(eeg, [saveDir filesep filename(i).name]);
         end
     else
@@ -35,7 +35,7 @@ function convertEegToEkg(loadPath, saveDir)
         
         % Process the data
         eeg = pop_loadset(loadPath);
-        eeg = getEkgFromEeg(eeg, 128);
+        eeg = getEkgFromEeg(eeg, minSrate);
         pop_saveset(eeg, [saveDir filesep name])% '.' ext]);
     end
 end

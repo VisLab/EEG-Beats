@@ -1,6 +1,6 @@
 function [ ibi, brMatched, brUnmatched, ptUnmatched ] = findConsecutiveRR( brPeaks, ptPeaks )
 %% Determine which of the refined R peaks are consecutive 
-%   findConsecutiveBeats finds whith R peaks found are consecutive and tests
+%   findConsecutiveBeats finds with R peaks found are consecutive and tests
 %   how many of our peaks matched the PanTompkins algorithm's peaks. 
 %
 % Parameters:
@@ -19,7 +19,7 @@ function [ ibi, brMatched, brUnmatched, ptUnmatched ] = findConsecutiveRR( brPea
 %               Pan-Tompkins algorithm.
 %   ptUnmatched (output) An array of indices containing all R peaks from
 %               the Pan-Tompkins algorithm that were not found in the 
-%               Beat Refinmentt algorithm. 
+%               Beat Refinement algorithm. 
 %%
 
 %% Initialize variables for matching

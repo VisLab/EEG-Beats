@@ -6,10 +6,8 @@
 
 %% Initialize variables to be used in script
     
-    % IBI raw data is stored in two folders, left hand and right hand,
-    % so two separate paths must be creates to load
-leftFolder = ('I:/Brenda/Documents/Kubios/RawData/left hand/');
-rightFolder = ('I:/Brenda/Documents/Kubios/RawData/right hand/');
+% The folder for the Eeg data
+
 
     %leftDir and rightDir are structs, we only want names of the files.
 leftDir = dir(fullfile(leftFolder, '*.mat'));
