@@ -49,57 +49,99 @@ if epsIdx == 0
 end
 
 % 
-lowerMax = median(ekg)-(20*1.4826*mad(ekg,1));
-upperMax = median(ekg)+(20*1.4826*mad(ekg,1));
+lowerMax = getAvgMin(ekg)-(10*1.4826*mad(ekg,1));
+upperMax = getAvgMax(ekg)+(10*1.4826*mad(ekg,1));
 ekg(ekg < lowerMax) = lowerMax;
 ekg(ekg > upperMax) = upperMax;
 ekgOriginal = ekg;
 
 % convert the rate and the time to index sizes in an array
 minDistIdx = max(round(below*srate), 1);
-lowerThreshold = median(ekg)-(2*1.4826*mad(ekg,1));
-upperThreshold = median(ekg)+(2*1.4826*mad(ekg,1));
+lowerThreshold = median(ekg)-(1.5*1.4826*mad(ekg,1));
+upperThreshold = median(ekg)+(1.5*1.4826*mad(ekg,1));
 
 %% Determine whether or not to flip the ekg signal
-flip = getFlipConsensus(ekg);
+flip = getConsensus(ekg, 1);
 if flip
     ekg = -ekg;
-    lowerThreshold = median(ekg)-(2*1.4826*mad(ekg,1));
-    upperThreshold = median(ekg)+(2*1.4826*mad(ekg,1));
+    lowerThreshold = median(ekg)-(1.5*1.4826*mad(ekg,1));
+    upperThreshold = median(ekg)+(1.5*1.4826*mad(ekg,1));
+    ekgOriginal = -ekgOriginal;
 end
+lowerThresholdLarge = median(ekg)-(3.5*1.4826*mad(ekg,1));
+upperThresholdLarge = median(ekg)+(3.5*1.4826*mad(ekg,1));
+sigRight = getConsensus(ekg, 2);
+
 
 %% Get the original peaks
 mask = initialParseIBI(ekg);
+maskTroughs = zeros(length(mask),1);
 
-indices = 1:1:length(ekg);
-peaksIdx = [1, indices(mask), length(t)];  %Array of suspected peaks given in sample numbers. Treated as a queue
-peaksFinalIdx = [];
-ekg = zeroOut(ekg, peaksIdx); %Zero out the signal around suspected peaks
-
-%% Get the other peaks
-while (length(peaksIdx) > 1) %Loop while suspeced peaks exist
-    innerBeat = getRefinement(peaksIdx(1), peaksIdx(2));
-    %See if there are more peaks between suspected peaks
-    if isempty(innerBeat) %No new peaks exists between the first and last beat
-        if peaksIdx(1) ~= 1
-            peaksFinalIdx = [peaksFinalIdx, peaksIdx(1)]; %Add firstBeat to the final list
+% Make sure the peaks are valid
+for iter = 1:length(mask)
+    if mask(iter) == 1
+        % Zero out the peaks or mark them as invalid
+        if sigRight
+            [result, beatIdx] = ...
+                determineIfPeak(iter, min(length(ekg), iter+epsIdx*2));
+        else
+            [result, beatIdx] = ...
+                determineIfPeak(iter, max(iter-epsIdx*2, 1));
         end
-        peaksIdx = peaksIdx(2:end); %Make t2 the new start of the suspected peaks list
-    else
-        if innerBeat ~= -1
-            peaksIdx = [peaksIdx(1) innerBeat peaksIdx(2:end)]; %tb is a suspected peak. Add it to the list
+        % set up the peak stuff
+        if result
+            ekg = zeroOut(ekg, iter);
+            maskTroughs(beatIdx(2)) = 1;
+        else
+            mask(iter) = 0;
         end
     end
 end
 
+maskTroughs = logical(maskTroughs);
+initIndices = 1:length(ekg);
+% Array of suspected peaks given in sample numbers. Treated as a queue
+peaksIdx = [1, initIndices(mask), length(t);...
+    1, initIndices(maskTroughs), length(t)];  
 
+peaksFinalIdx = [];
+%% Get the other peaks
+sizeOfPeaks = size(peaksIdx);
+while (sizeOfPeaks(2) > 1) %Loop while suspected peaks exist
+    innerBeat = getRefinement(peaksIdx(1,1), peaksIdx(1,2));
+    %See if there are more peaks between suspected peaks
+    if isempty(innerBeat) %No new peaks exists between the first and last beat
+        if peaksIdx(1) ~= 1
+            peaksFinalIdx = [peaksFinalIdx, peaksIdx(:,1)]; %Add firstBeat to the final list
+        end
+        peaksIdx = peaksIdx(:,2:end); %Make t2 the new start of the suspected peaks list
+    else
+        if innerBeat ~= -1
+            peaksIdx = [peaksIdx(:,1) innerBeat peaksIdx(:,2:end)]; %tb is a suspected peak. Add it to the list
+        end
+    end
+    sizeOfPeaks = size(peaksIdx);
+end
+
+
+peaksFinalIdx = cleanPeaks(peaksFinalIdx);
 if flip
-    peaksFinalIdx = getPeaksFromTroughs(ekgOriginal, peaksFinalIdx);
+    peaksFinalIdx = flipPeaksAndTroughs(peaksFinalIdx);
 end
 peaksFinalTm = (peaksFinalIdx-1)/srate;
 
-    function flipCons = getFlipConsensus(ekg)
+    function cons = getConsensus(ekg, consType)
         %% Compare multiple different intervals to determine if to flip
+        % Parameters:
+        %       ekg             the data to get the consensus
+        %       consType        the type of consensus to get 
+        %                       (1 = flip, 2 = peakDir)
+        % Result:
+        %       cons            if consType = 1;
+        %                           true = flip, false = not flip
+        %                       if consType = 2;
+        %                           true = troughRight, false = troughLeft
+        %% 
         % within that interval. Generate a consensus for that.
         consensusIntervalIdx = consensusIntervalLen * srate;
         numIntervals = min(length(ekg)/consensusIntervalIdx, 10);
@@ -121,45 +163,166 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         % calculate if flip is true for each interval
         % for each interval do determine is flip. Then determine
         % consensus
-        flipCnt = 0;
+        consCnt = 0;
         for i = 1:numIntervals
-            flipCnt = flipCnt + ...
-                determineIfFlip(ekg(startIdx(i):startIdx(i)+consensusIntervalIdx));
+            if consType == 1
+                consCnt = consCnt + ...
+                    determineIfFlip( ...
+                    ekg(startIdx(i):startIdx(i)+consensusIntervalIdx));
+            elseif consType == 2
+                consCnt = consCnt + ...
+                    determineIfTroughRight( ...
+                    ekg(startIdx(i):startIdx(i)+consensusIntervalIdx));
+            end
+            
+        end
+        if consCnt >= ceil(numIntervals/2)
+            cons = true;
+        else
+            cons = false;
+        end
+    end
+
+    function minVal = getAvgMin(ekg)
+         %% Compare multiple different intervals to determine an average minimum
+        % Parameters:
+        %       ekg             the data to get the consensus
+        %       consType        the type of consensus to get 
+        %                       (1 = flip, 2 = peakDir)
+        % Result:
+        %       minVal          the average minimum
+        %% 
+        % Set up the intervals.
+        consensusIntervalIdx = consensusIntervalLen * srate;
+        numIntervals = min(length(ekg)/consensusIntervalIdx, 10);
+        maxIntervalLenIdx = floor(length(ekg)/numIntervals);
+        startIdx = zeros(1,numIntervals);
+        
+        % get the start indices for the intervals
+        if maxIntervalLenIdx == consensusIntervalIdx 
+            for i = 1:numIntervals
+                startIdx(i) = (i-1)*maxIntervalLenIdx + 1;
+            end
+        else
+            for i = 1:numIntervals
+                startIdx(i) = (i-1)*maxIntervalLenIdx + 1 + ...
+                    floor(rand() * (maxIntervalLenIdx - consensusIntervalIdx));
+            end
         end
         
-        if flipCnt >= ceil(numIntervals/2)
-            flipCons = true;
-        else
-            flipCons = false;
+        % Get the minimum value for the interval
+        total = 0;
+        for i = 1:numIntervals
+            total = total + min(ekg(startIdx(i):startIdx(i)+consensusIntervalIdx));
         end
+        minVal = total / (numIntervals*1.0);
+    end
+    function maxVal = getAvgMax(ekg)
+         %% Compare multiple different intervals to determine an average maximum
+        % Parameters:
+        %       ekg             the data to get the consensus
+        %       consType        the type of consensus to get 
+        %                       (1 = flip, 2 = peakDir)
+        % Result:
+        %       maxVal          the average maximum
+        %% 
+        % Set up the intervals
+        consensusIntervalIdx = consensusIntervalLen * srate;
+        numIntervals = min(length(ekg)/consensusIntervalIdx, 10);
+        maxIntervalLenIdx = floor(length(ekg)/numIntervals);
+        startIdx = zeros(1,numIntervals);
+        
+        % get the start indices for the intervals
+        if maxIntervalLenIdx == consensusIntervalIdx 
+            for i = 1:numIntervals
+                startIdx(i) = (i-1)*maxIntervalLenIdx + 1;
+            end
+        else
+            for i = 1:numIntervals
+                startIdx(i) = (i-1)*maxIntervalLenIdx + 1 + ...
+                    floor(rand() * (maxIntervalLenIdx - consensusIntervalIdx));
+            end
+        end
+        
+        % Sum um the maximum values per interval
+        total = 0;
+        for i = 1:numIntervals
+            total = total + max(ekg(startIdx(i):startIdx(i)+consensusIntervalIdx));
+        end
+        maxVal = total / (numIntervals*1.0);
     end
 
     function flip = determineIfFlip(ekg)
     %%
     % Parameters: 
-    %   ekg the data to base off ofccc
+    %   ekg the data to base off of
     % Purpose:
-    %   Determine if the ekg data needs to be converted to the negative.
+    %   Determine if the ekg data needs to be flipped.
     %%
         flip = 0;
         
         % Get the maximum value
         [~, maxIdx] = max(ekg);
-        if ekg(maxIdx) < upperThreshold
+        [~, minIdx] = min(ekg);
+        if ekg(maxIdx) < upperThreshold && ekg(minIdx) > lowerThreshold
             return
         end
+        % You need to flip the ekg
+        if abs(ekg(maxIdx)) < abs(ekg(minIdx))
+            flip = 1;
+        end
+    end
+
+    function troughRight = determineIfTroughRight(ekg)
+    %%
+    % Parameters: 
+    %   ekg the data to base off of
+    % Purpose:
+    %   Determine if the trough of the peak is to the right
+    %%
+        troughRight = 0;
+        
+        % Get the maximum value
+        [~, maxIdx] = max(ekg);
+        
         % Get the miniumum value around that peak
         [interval1Idx, ~] = max([maxIdx-2*epsIdx, 1]);
         [interval2Idx, ~] = min([maxIdx+2*epsIdx, length(ekg)]);
-        [~, minIdx] = min(ekg(interval1Idx:interval2Idx));
-        minIdx = minIdx + interval1Idx-1;
         
-        % You need to flip the ekg
-        if maxIdx > minIdx
-            flip = 1;
+        % Trough left
+        negSigLeft = -ekg(interval1Idx:maxIdx);
+        if isempty(negSigLeft) || length(negSigLeft) < 3 
+            return;
         end
-        return        
+        negTimeLeft = 1:length(negSigLeft);
+        [sValL,sLocsL,~,~] = findpeaks(double(negSigLeft), negTimeLeft, ...
+            'MinPeakHeight', -lowerThreshold);
+        if isempty(sLocsL) || sLocsL(1) >= epsIdx
+            return;
+        end
+        
+        % Trough right
+        troughRight = 1;
+        negSigRight = -ekg(interval2Idx:maxIdx);
+        if isempty(negSigRight) || length(negSigRight) < 3 
+            return;
+        end
+        negTimeRight = fliplr(1:length(negSigRight));
+        [sValR,sLocsR,~,~] = findpeaks(double(negSigRight), negTimeRight, ...
+            'MinPeakHeight', -lowerThreshold);
+        if isempty(sLocsR) || sLocsR(1) >= epsIdx
+            return;
+        end
+        
+        % Go left
+        if sValL(1) > sValR(1)
+            return;
+        end
+        
+        troughRight = 0;
+        return;
     end
+
     function innerBeatIdx = getRefinement(firstBeatIdx, lastBeatIdx)
     %% Find a beat peak between two existing beats if it exists
     %
@@ -172,29 +335,27 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
     %       innerBeatIdx = getRefinement(firstBeatIdx, lastBeatIdx)
     %%
         innerBeatIdx = [];
-        
         % very unlikely to find a heartbeat in this range
         if lastBeatIdx - firstBeatIdx < minDistIdx %IBI < maxDist (1.5 s)
             return;
         end 
 
         thisSignal = ekg(firstBeatIdx:lastBeatIdx);
-        
         %Find the maximum between two known peaks
         [~,innerBeatBaseIdx] = max(thisSignal); %index of the max from first beat
         
         % For the case that everything in that interval is <= 0
-        if notFeasible(firstBeatIdx, innerBeatBaseIdx, lastBeatIdx) %Not a valid peak
-           innerBeatIdx = innerBeatBaseIdx + firstBeatIdx - 1; 
+        [notFeasibleVal, innerBeatIdx] = ...
+            notFeasible(firstBeatIdx, innerBeatBaseIdx, lastBeatIdx);
+        if notFeasibleVal %Not a valid peak
            if (ekg(innerBeatIdx)) < upperThreshold
                innerBeatIdx = [];
                return;
            end
-           ekg = zeroOut(ekg, innerBeatIdx);
+           ekg = zeroOut(ekg, innerBeatIdx(1,1));
            innerBeatIdx = -1;
         else
-           innerBeatIdx = innerBeatBaseIdx + firstBeatIdx - 1; 
-           ekg = zeroOut(ekg, innerBeatIdx);
+           ekg = zeroOut(ekg, innerBeatIdx(1,1));
         end
     end	
 
@@ -215,22 +376,25 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
            lastSampleIdx = round(min(peaksIdx(k) + epsIdx, length(ekg))); %Min between tb+above and length of ekg
            ekg(firstSampleIdx: lastSampleIdx) = 0;
         end
-        
-        
     end
 
-    function result = determineIfPeak(beatIdx, endValue)
+    function [result, innerBeatIdx] = determineIfPeak(beatIdx, endValue)
         %%
         % Determine if the value at the peak is actually a peak.
         % Parameters:
         %    beatIdx   the index of the peak
         %%
+        innerBeatIdx = [beatIdx; beatIdx];
         
         % get the negation of the ekg signal from the inner beat's index
         % to the last beat's index
-        negSignal = -ekg(beatIdx:endValue);%firstBeatIdx:lastBeatIdx);
+        if sigRight
+            negSignal = -ekg(beatIdx:endValue);%firstBeatIdx:lastBeatIdx);
+        else
+            negSignal = fliplr(-ekg(endValue:beatIdx));
+        end
         if isempty(negSignal) || length(negSignal) < 3
-            result =1;
+            result = 0;
             return;
         end
         
@@ -238,18 +402,24 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         negTime = 1:length(negSignal);
         [sVal,sLocs,~,~] = findpeaks(double(negSignal), negTime,...
                         'MinPeakHeight', -lowerThreshold);
-        
+
         %[~,index] = min(abs(sLocs-innerBeatBaseIdx));
         %index = sLocs(1);
         
         if isempty(sLocs) || sLocs(1) >= epsIdx || ...
-                ~(-sVal(1)  < lowerThreshold)
-            result = 1;
+                ~(-sVal(1)  < lowerThreshold && ...
+                ekg(beatIdx) > upperThreshold)
+            result = 0;
+            return;
+        end
+        if sigRight
+            innerBeatIdx = [beatIdx; sLocs(1) + beatIdx - 1];
         else
-            result = 0; 
-        end      
+            innerBeatIdx = [beatIdx; beatIdx - sLocs(1) + 1];
+        end
+        result = 1;
     end
-    function result = notFeasible(firstBeatIdx, innerBeatBaseIdx, lastBeatIdx)
+    function [result, innerBeatIdx] = notFeasible(firstBeatIdx, innerBeatBaseIdx, lastBeatIdx)
     %% Determine if the innerBeatBaseIdx meets the criteria for an R peak.
     % 
     % notFeasible determines if innerBeatBaseIdx meets the criteria for being an R
@@ -268,6 +438,8 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
     %   Example:
     %       result = notFeasible(firstBeatIdx, innerBeatBaseIdx, lastBeatIdx)
     %%
+        innerBeatIdx = [innerBeatBaseIdx+firstBeatIdx-1, innerBeatBaseIdx+firstBeatIdx-1];
+        
         % Ensure not an end point
         if (innerBeatBaseIdx == 1) || ...
             (innerBeatBaseIdx + firstBeatIdx - 1 == lastBeatIdx) || ...
@@ -282,33 +454,17 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
             result = 1;
             return;
         end
-    
-        result = determineIfPeak(innerBeatBaseIdx+firstBeatIdx-1,lastBeatIdx);
-        return; 
         
-        % get the negation of the ekg signal from the inner beat's index
-        % to the last beat's index
-        negSignal = -ekg(innerBeatBaseIdx+firstBeatIdx-1:lastBeatIdx);%firstBeatIdx:lastBeatIdx);
-        if isempty(negSignal)
-            result =1;
-            return;
-        end
-        
-        % find the locations of the troughs
-        negTime = 1:length(negSignal);
-        [sVal,sLocs,~,~] = findpeaks(double(negSignal), negTime,...
-                        'MinPeakHeight', -lowerThreshold);
-        
-        %[~,index] = min(abs(sLocs-innerBeatBaseIdx));
-        %index = sLocs(1);
-        
-        if isempty(sLocs) || sLocs(1) >= epsIdx || ...
-                ~(-sVal(1)  < lowerThreshold)
-            result = 1;
+        if sigRight
+            [result, innerBeatIdx] = ...
+                determineIfPeak(innerBeatBaseIdx+firstBeatIdx-1,lastBeatIdx);
         else
-            result = 0; 
-        end     
-        return;
+            [result, innerBeatIdx] = ...
+                determineIfPeak(innerBeatBaseIdx+firstBeatIdx-1,firstBeatIdx);
+        end
+            
+        result = ~result;
+        return; 
     end
 
     function [idx] = initialParseIBI(signal)
@@ -322,6 +478,7 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
     %       idx = initialParseIBI(signal)
     %
         a = min(signal)*.15; 
+        maxValues = [];
         index = find((signal - a) < 20 & signal > (a-1)); %handful of R peaks 
         if length(index) == 0
             error('Invalid data: Unable to find any peaks');
@@ -346,12 +503,10 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
                 thisSignal = signal(index(i-1):thisIdx);
                 thisIdx = index(i-1);
             end
-            [yValue, yValueIdx] = max(thisSignal);
+            [yValue, ~] = max(thisSignal);
             
-            % if it is actually a peak, add it to the list
-            if yValue > upperThreshold && ...
-                    determineIfPeak(yValueIdx+thisIdx-1, ...
-                    min(yValue+thisIdx+epsIdx*2, length(thisSignal)))
+            % if it is big enough, add it to the list
+            if yValue > upperThreshold 
                 maxValues(b) = yValue;
                 b = b + 1;
             end
@@ -367,28 +522,37 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         idx = ismember(signal', maxValuesFew);
     end
 
-    function realPeaksIdx = getPeaksFromTroughs(ekg, troughsIdx)
+    function realPeaksIdx = flipPeaksAndTroughs(peaksIdx)
     %%
-    % If we just have the troughs of the ekg data, get the peaks of the
-    % data.
+    % Flip the peaks and troughs
     % Parameters
     %    ekg            the data to get the peaks from
-    %    troughsIdx     the indices of the troughs
+    %    peakssIdx      the original indices of the peaks
     % Returns
     %    realPeaksIdx   the indices of the actual peaks
     %%
-        realPeaksIdx = [];
-        for i = 1:length(troughsIdx)
-            [interval1Idx, ~] = max([troughsIdx(i), 1]);
-            [interval2Idx, ~] = min([troughsIdx(i)+epsIdx, length(ekg)]);
-            [~, maxIdx] = max(ekg(interval1Idx:interval2Idx));
-            maxIdx = maxIdx + interval1Idx-1;
-            if maxIdx == 1 || maxIdx == length(ekg) ...
-                    || ekg(maxIdx) < upperThreshold ...
-                    || ismember(maxIdx, realPeaksIdx)
+        realPeaksIdx = [peaksIdx(2,:); peaksIdx(1,:)];
+    end
+    
+    function cleanedPeaks = cleanPeaks(peaksIdx)
+    %% 
+    % Clean up the peaks to remove unused values
+    % Parameters
+    %   peaksIdx        index of the peaks
+    % Returns
+    %   cleanedPeaks    the cleaned result
+    %%
+        cleanedPeaks = [];
+        for i = 1:length(peaksIdx)
+            % exclude repeated peaks or non-peaks (i.e., peak = trough)
+            if peaksIdx(1, i) == peaksIdx(2, i) || ...
+                    (~isempty(cleanedPeaks) && ...
+                    peaksIdx(1,i) == cleanedPeaks(1, end)) || ...
+                    (ekgOriginal(peaksIdx(1,i)) < upperThresholdLarge && ...
+                    ekgOriginal(peaksIdx(2,i)) > lowerThresholdLarge)
                 continue;
             end
-            realPeaksIdx = [realPeaksIdx maxIdx];
+            cleanedPeaks = [cleanedPeaks peaksIdx(:,i)];
         end
     end
 end 

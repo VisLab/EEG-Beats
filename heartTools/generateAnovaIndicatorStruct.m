@@ -6,7 +6,6 @@ sessionsBase = 'Z:\Data 3\NCTU_RWN_VDE_128Hz\session';
 savePath = 'E:\sabrina\Documents\EKG\Anova\IndicatorStruct.mat';
 saveBadDataPath = 'E:\sabrina\Documents\EKG\Anova\BadDataList.mat';
 minSrate = 128;
-%badElements = [114, 135, 136, 137, 138, 356, 401, 402, 403, 404, 405, 406, 414, 433]; % 401, 402 is a really weird dataset
 test = load(metadataPath);
 metadata = test.metadata;
 ibiMaxDist = 1.5;
@@ -36,6 +35,9 @@ end
 validMask = true(numDataSets, 1);
 for i = 1:numDataSets
     %i = 114;
+    if i < 234%0%61%230%226%61%13% 23
+        continue;
+    end
     %if ismember(i, badElements)
         %validMask(i) = false;
         %continue;
@@ -55,23 +57,28 @@ for i = 1:numDataSets
     % process the data
     eeg = pop_loadset([files(1).folder filesep files(1).name]);
     eeg = getEkgFromEeg(eeg, minSrate);    
-    
+     
     if isempty(eeg) 
         validMask(i) = false;
         continue;
     end
     
-    %figure;
-    %hold on;
-    %plot(eeg.data);
+    figure;
+    title(i);
+    hold on;
+    plot(eeg.data);
     % Get the indicators
-    % get the peaks and ibi
     try
         [peaks, peaksTm] = getHeartBeats(eeg);
         
-        if length(peaks) < eeg.times(end)/100
-            error('Invalid data: Too few peaks');
-        end
+        %if length(peaks) < eeg.times(end)/10000
+            %error('Invalid data: Too few peaks');
+        %end
+        
+        % Generate the ibi
+        %plot(peaks, eeg.data(peaks), 'r*');
+    	ibi = generateIBI(peaksTm(1,:), ibiMaxDist, ibiMinDist);
+        indicators = getIBIIndicators(ibi(:,2));        
     catch EX
         % Print a warning message and add to badData list
         warning('Invalid data. Skipping');
@@ -79,15 +86,12 @@ for i = 1:numDataSets
         validMask(i) = false;
         continue;
     end
-    ibi = generateIBI(peaksTm, ibiMaxDist, ibiMinDist);
-    
     %figure;
     %hold on;
     %plot(eeg.data);
-    %plot(peaks, eeg.data(peaks), 'r*');
+    plot(peaks(1,:), eeg.data(peaks(2,:)), 'r*');
+    %close all;
     % Get the indicators
-    indicators = getIBIIndicators(ibi(:,2));
-    
     % set the indicators
     ibiStatsSummary(i).mean = indicators(1);
     ibiStatsSummary(i).sdnn = indicators(2);

@@ -13,3 +13,11 @@ hist(meanIbi, sqrt(length(meanIbi)));
 xlabel('IBI mean');
 ylabel('count');
 
+%% Some histfit
+figure('Name', 'IBI mean fit-lognormal');
+h = histfit(meanIbi, 25, 'lognormal');
+xlabel('IBI mean');
+ylabel('count');
+
+%% Fitdist
+pd = fitdist(meanIbi(:), 'lognormal');
