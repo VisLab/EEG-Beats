@@ -62,6 +62,7 @@ upperThreshold = median(ekg)+(1.5*1.4826*mad(ekg,1));
 
 %% Determine whether or not to flip the ekg signal
 flip = getConsensus(ekg, 1);
+temp = median(ekg)
 if flip
     ekg = -ekg;
     lowerThreshold = median(ekg)-(1.5*1.4826*mad(ekg,1));
@@ -144,7 +145,7 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         %% 
         % within that interval. Generate a consensus for that.
         consensusIntervalIdx = consensusIntervalLen * srate;
-        numIntervals = min(length(ekg)/consensusIntervalIdx, 10);
+        numIntervals = min(length(ekg)/consensusIntervalIdx, 31);
         maxIntervalLenIdx = floor(length(ekg)/numIntervals);
         startIdx = zeros(1,numIntervals);
         
@@ -280,8 +281,7 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
     % Purpose:
     %   Determine if the trough of the peak is to the right
     %%
-        troughRight = 0;
-        
+        troughRight = 1;
         % Get the maximum value
         [~, maxIdx] = max(ekg);
         
@@ -290,7 +290,7 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         [interval2Idx, ~] = min([maxIdx+2*epsIdx, length(ekg)]);
         
         % Trough left
-        negSigLeft = -ekg(interval1Idx:maxIdx);
+        negSigLeft = fliplr(-ekg(interval1Idx:maxIdx));
         if isempty(negSigLeft) || length(negSigLeft) < 3 
             return;
         end
@@ -302,12 +302,12 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         end
         
         % Trough right
-        troughRight = 1;
-        negSigRight = -ekg(interval2Idx:maxIdx);
+        troughRight = 0;
+        negSigRight = -ekg(maxIdx:interval2Idx);
         if isempty(negSigRight) || length(negSigRight) < 3 
             return;
         end
-        negTimeRight = fliplr(1:length(negSigRight));
+        negTimeRight = 1:length(negSigRight);
         [sValR,sLocsR,~,~] = findpeaks(double(negSigRight), negTimeRight, ...
             'MinPeakHeight', -lowerThreshold);
         if isempty(sLocsR) || sLocsR(1) >= epsIdx
@@ -315,11 +315,9 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         end
         
         % Go left
-        if sValL(1) > sValR(1)
-            return;
+        if sValL(1) < sValR(1)
+            troughRight = 1;
         end
-        
-        troughRight = 0;
         return;
     end
 
@@ -336,9 +334,9 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
     %%
         innerBeatIdx = [];
         % very unlikely to find a heartbeat in this range
-        if lastBeatIdx - firstBeatIdx < minDistIdx %IBI < maxDist (1.5 s)
-            return;
-        end 
+        %if lastBeatIdx - firstBeatIdx < minDistIdx %IBI < maxDist (1.5 s)
+        %    return;
+        %end 
 
         thisSignal = ekg(firstBeatIdx:lastBeatIdx);
         %Find the maximum between two known peaks
@@ -348,7 +346,7 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         [notFeasibleVal, innerBeatIdx] = ...
             notFeasible(firstBeatIdx, innerBeatBaseIdx, lastBeatIdx);
         if notFeasibleVal %Not a valid peak
-           if (ekg(innerBeatIdx)) < upperThreshold
+           if (thisSignal(innerBeatBaseIdx)) < upperThreshold
                innerBeatIdx = [];
                return;
            end
@@ -371,10 +369,14 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
      %  Example:
      %      ekg = zeroOut(ekg, peaksidx, below, above, srate)
      %%
+        setVal = 0;
+        if upperThreshold < setVal
+            setVal = upperThreshold-1;
+        end
         for k = 1:length(peaksIdx) %Zero out area around peaks
            firstSampleIdx = round(max(1, peaksIdx(k) - epsIdx)); %Max between 1 and tb-below
            lastSampleIdx = round(min(peaksIdx(k) + epsIdx, length(ekg))); %Min between tb+above and length of ekg
-           ekg(firstSampleIdx: lastSampleIdx) = 0;
+           ekg(firstSampleIdx: lastSampleIdx) = setVal;
         end
     end
 
@@ -441,12 +443,12 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         innerBeatIdx = [innerBeatBaseIdx+firstBeatIdx-1, innerBeatBaseIdx+firstBeatIdx-1];
         
         % Ensure not an end point
-        if (innerBeatBaseIdx == 1) || ...
-            (innerBeatBaseIdx + firstBeatIdx - 1 == lastBeatIdx) || ...
-            abs(lastBeatIdx-firstBeatIdx) < epsIdx
-            result = 1;
-            return
-        end
+        %if (innerBeatBaseIdx == 1) || ...
+        %    (innerBeatBaseIdx + firstBeatIdx - 1 == lastBeatIdx) || ...
+        %    abs(lastBeatIdx-firstBeatIdx) < epsIdx
+        %    result = 1;
+        %    return
+        %end
         
         % innerBeatBaseIdx is two close to firstBeatIdx or lastBeatIdx
         if ~(minDistIdx < innerBeatBaseIdx-1) || ...
@@ -479,7 +481,8 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
     %
         a = min(signal)*.15; 
         maxValues = [];
-        index = find((signal - a) < 20 & signal > (a-1)); %handful of R peaks 
+        
+        index = linspace(1,length(signal), 5*epsIdx); %handful of R peaks 
         if length(index) == 0
             error('Invalid data: Unable to find any peaks');
         end

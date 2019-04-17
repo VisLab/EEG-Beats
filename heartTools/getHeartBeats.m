@@ -24,7 +24,7 @@ t = (t-1)/EEG.srate;
 below = 0.5;
 above = 1.5;
 qrsDuration = 0.1;
-consensusIntervalLen = 1;
+consensusIntervalLen = 5;
 
 %Find R peaks using the Beat Refinment and Pan-Tompkins algorithms
 [brPeaksIdx, brPeaksTm] = getBeatRefinement(EEG.data, t, EEG.srate, below,...

@@ -35,13 +35,14 @@ end
 validMask = true(numDataSets, 1);
 for i = 1:numDataSets
     %i = 114;
-    if i < 234%0%61%230%226%61%13% 23
+    if i < 262%113%10%88%129%125%234%0%61%230%226%61%13% 23
         continue;
     end
     %if ismember(i, badElements)
         %validMask(i) = false;
         %continue;
     %end
+    
     
     % load the data
     dataPath = [sessionsBase filesep int2str(ibiStatsSummary(i).session) ...
@@ -63,7 +64,7 @@ for i = 1:numDataSets
         continue;
     end
     
-    figure;
+    h = figure();
     title(i);
     hold on;
     plot(eeg.data);
@@ -80,6 +81,12 @@ for i = 1:numDataSets
     	ibi = generateIBI(peaksTm(1,:), ibiMaxDist, ibiMinDist);
         indicators = getIBIIndicators(ibi(:,2));        
     catch EX
+        fileId = fopen(['E:\sabrina\Documents\eegHeartPlots\errors' filesep 'errors_' int2str(i) '.txt'], 'w');
+        fprintf(fileId, '%s\n', EX.message);
+        for e=1:length(EX.stack)
+            fprintf(fileId, 'in %s at %i\n', EX.stack(e).name, EX.stack(e).line);
+        end
+        fclose(fileId);
         % Print a warning message and add to badData list
         warning('Invalid data. Skipping');
         badData = [badData i];
@@ -89,8 +96,13 @@ for i = 1:numDataSets
     %figure;
     %hold on;
     %plot(eeg.data);
-    plot(peaks(1,:), eeg.data(peaks(2,:)), 'r*');
-    %close all;
+    
+    plot(peaks(1,:), eeg.data(peaks(1,:)), 'r*');
+    plot(peaks(2,:), eeg.data(peaks(2,:)), 'g*');
+    set(h, 'position', [0 0 3000 1500])
+    saveas(h, ['E:\sabrina\Documents\eegHeartPlots\images\fig' filesep 'images_' int2str(i) '.fig'], 'fig');
+    saveas(h, ['E:\sabrina\Documents\eegHeartPlots\images\png' filesep 'images_' int2str(i) '.png'], 'png');
+    close all;
     % Get the indicators
     % set the indicators
     ibiStatsSummary(i).mean = indicators(1);
