@@ -1,6 +1,6 @@
 %% function [eeg] = getEkgFromEeg(eeg, srate)
 % convert and eeg to the resulting ekg
-function [eeg] = getEkgFromEeg(eeg, minSrate)
+function [eeg] = getEkgFromEeg(eeg, minSrate, low, high)
     if size(eeg.data, 1) ~= 63
         eeg = [];
         return;
@@ -18,6 +18,6 @@ function [eeg] = getEkgFromEeg(eeg, minSrate)
     end
 
     % Filter the data
-    eeg = pop_eegfiltnew(eeg, 3, 20);%, 660, 0, [], 0);
+    eeg = pop_eegfiltnew(eeg, low, high);%, 660, 0, [], 0);
 end
 

@@ -62,7 +62,6 @@ upperThreshold = median(ekg)+(1.5*1.4826*mad(ekg,1));
 
 %% Determine whether or not to flip the ekg signal
 flip = getConsensus(ekg, 1);
-temp = median(ekg)
 if flip
     ekg = -ekg;
     lowerThreshold = median(ekg)-(1.5*1.4826*mad(ekg,1));
@@ -109,6 +108,9 @@ peaksFinalIdx = [];
 %% Get the other peaks
 sizeOfPeaks = size(peaksIdx);
 while (sizeOfPeaks(2) > 1) %Loop while suspected peaks exist
+    if(peaksIdx(1,1) > 1300)
+        x = 5;
+    end
     innerBeat = getRefinement(peaksIdx(1,1), peaksIdx(1,2));
     %See if there are more peaks between suspected peaks
     if isempty(innerBeat) %No new peaks exists between the first and last beat
@@ -408,8 +410,17 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         %[~,index] = min(abs(sLocs-innerBeatBaseIdx));
         %index = sLocs(1);
         
-        if isempty(sLocs) || sLocs(1) >= epsIdx || ...
+        if isempty(sLocs) || sLocs(1) > epsIdx || ...
                 ~(-sVal(1)  < lowerThreshold && ...
+                ekg(beatIdx) > upperThreshold)
+            result = 0;
+            return;
+        end
+        if sLocs(1) > epsIdx 
+            result = 0;
+            return;
+        end
+        if ~(-sVal(1)  < lowerThreshold && ...
                 ekg(beatIdx) > upperThreshold)
             result = 0;
             return;
