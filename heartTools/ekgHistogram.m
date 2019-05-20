@@ -1,6 +1,6 @@
-%% Make a histogram of the ekg indicator
+%% Make a histogram of the given ibi indicator
 % Used to determine if the data is reasonable.
-
+%%
 %% Load the data
 ibiSummaryPath = 'E:\sabrina\Documents\EKG\Anova\IndicatorStruct.mat';
 test = load(ibiSummaryPath);

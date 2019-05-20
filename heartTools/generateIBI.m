@@ -1,11 +1,16 @@
 function [ibi, tooLarge, tooSmall] = generateIBI(peaksTm, maxDist, minDist)
-%% Get the inter-beat intervals of the peaks with a given srate
+%% Get the inter-beat intervals of the peaks with errors for being too far
+%  apart or too close together.
 % Input: 
 %   peaksTm     the time of the peaks to get the ibi from
-%   threshold   Threshold for time between peaks. Every ibi should be below that.
-%   fid         Id of the file to write to
+%   maxDist     the maximum allowed distance between peaks
+%   minDist     the minimum allowed distance between peaks
 % Returns:
-%   A nx2 dimentional array of the form [peakTimes, timeToNextPeak]
+%   the ibi
+%   a list of invalid peaks that are too far apart
+%       (the first peak in that pair)
+%   a list of invalid peaks that are too close together
+%       (the first peak in that pair)
 %%
     % Initialize the ibi
     ibi = zeros(length(peaksTm)-1, 2);

@@ -17,9 +17,7 @@ function [peaksFinalIdx, peaksFinalTm] = getBeatRefinement(ekg, t, srate, below,
 %               NOTE: this is not used... do we want to change that?
 %      qrsDuration
 %               The width of a peak in seconds
-%      consensusIntervalLen
-%               The length of a consensus interval for calculating
-%               different parametrs.
+%       consensusIntervalLen
 %      peaksFinalIdx
 %               (output) An array of indices of suspected R peaks within the EKG
 %               signal.
@@ -108,8 +106,7 @@ initIndices = 1:length(ekg);
 peaksIdx = [1, initIndices(mask), length(t);...
     1, initIndices(maskTroughs), length(t)];  
 
-x = 0;
-peaksFinalIdx = zeros(2, length(ekg));
+peaksFinalIdx = [];
 %% Get the other peaks
 sizeOfPeaks = size(peaksIdx);
 while (sizeOfPeaks(2) > 1) %Loop while suspected peaks exist
@@ -117,8 +114,7 @@ while (sizeOfPeaks(2) > 1) %Loop while suspected peaks exist
     %See if there are more peaks between suspected peaks
     if isempty(innerBeat) %No new peaks exists between the first and last beat
         if peaksIdx(1) ~= 1
-            x = x + 1;
-            peaksFinalIdx(:,x) = peaksIdx(:,1); %Add firstBeat to the final list
+            peaksFinalIdx = [peaksFinalIdx, peaksIdx(:,1)]; %Add firstBeat to the final list
         end
         peaksIdx = peaksIdx(:,2:end); %Make t2 the new start of the suspected peaks list
     else
@@ -129,7 +125,7 @@ while (sizeOfPeaks(2) > 1) %Loop while suspected peaks exist
     sizeOfPeaks = size(peaksIdx);
 end
 
-peaksFinalIdx = peaksFinalIdx(:, 1:x);
+
 peaksFinalIdx = cleanPeaks(peaksFinalIdx);
 if flip
     peaksFinalIdx = flipPeaksAndTroughs(peaksFinalIdx);
@@ -564,7 +560,7 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
                 continue;
             end
             b = b + 1;
-            cleanedPeaks(:, b) = peaksIdx(:,i);
+            cleanedPeaks(:, b) = peaksIdx(:,1);
         end
         cleanedPeaks = cleanedPeaks(:, 1:b);
     end

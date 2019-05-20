@@ -1,5 +1,13 @@
 function [indicators] = getIBIIndicators(rrIntervals)
 %% Given a specific ibi generate the indicators
+% Parameters:
+%       the ibi signal
+% Return value:
+%       the different statistical indicators as a list of size 6
+%       containing the following in order:
+%           mean std rmssd nn50
+%           pnn50 rrt
+%%
     if(iscell(rrIntervals))
         rrIntervals = cell2mat(rrIntervals);
     end

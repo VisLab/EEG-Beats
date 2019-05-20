@@ -18,9 +18,10 @@ ibiMinDist = 0.1;
 numDataSets = length(metadata);
 eeg_filter_low = 3;
 eeg_filter_high = 20;
-badData = [];
 low = int2str(eeg_filter_low);
 high = int2str(eeg_filter_high);
+badData = zeros(1, numDataSets);
+b = 0;
 
 % save paths for all the structs
 savePathIbI = [savePathFolder filesep 'IndicatorStruct' ...
@@ -62,7 +63,7 @@ ibiErrorSummary(numDataSets) = struct('session', NaN, 'filename', NaN, ...
     'tooLarge', NaN, 'tooSmall', NaN, 'errorMsg', NaN);
 
 % Populate the basic data
-for i = 1:numDataSets
+for i = 1:20
     % NaN it out
     ekgSignal(i) = ekgSignal(end);
     ekgPeaks(i) = ekgPeaks(end);
@@ -89,7 +90,8 @@ for i = 1:numDataSets
     files = dir(dataPath);
     
     if isempty(files)
-        badData = [badData i];
+        b = b + 1;
+        badData(b) = i;
         validMask(i) = false;
         continue;
     end
@@ -133,14 +135,15 @@ for i = 1:numDataSets
         end
         % Print a warning message and add to badData list
         warning('Invalid data. Skipping');
-        badData = [badData i];
+        b = b + 1;
+        badData(b) = i;
         validMask(i) = false;
         continue;
     end
     
     % Plot the data if we want to
     if doPlot
-        figure;
+        h = figure;
         hold on;
         plot(eeg.data);
 
@@ -162,6 +165,7 @@ for i = 1:numDataSets
 end
 
 %% Save
+badData = badData(1:b);
 ibiStatsSummary = ibiStatsSummary(validMask);
 
 save(savePathIbI, 'ibiStatsSummary');

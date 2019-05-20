@@ -1,7 +1,8 @@
 %% Get the EEG data, load it, filter the HR, and save the HR rate
 % Parameters:
 %   loadPath        the path to load the data from
-%   saveDir         the directory to load the data to.
+%   saveDir         the directory to store the data to.
+%   minSrate        the minimum sampling rate to use
 %%
 function convertEegToEkg(loadPath, saveDir, minSrate)
     % Create the directory if it does not exist
@@ -27,7 +28,7 @@ function convertEegToEkg(loadPath, saveDir, minSrate)
         end
     else
         % Skip if already done
-        [~, name, ext] = fileparts(loadPath);
+        [~, name, ~] = fileparts(loadPath);
         if exist([saveDir filesep name '.set'], 'file')
         	fprintf('Error: File already exists: %s\n', loadPath);
             return;

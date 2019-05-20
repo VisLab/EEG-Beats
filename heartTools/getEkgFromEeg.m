@@ -1,6 +1,14 @@
-%% function [eeg] = getEkgFromEeg(eeg, srate)
-% convert and eeg to the resulting ekg
 function [eeg] = getEkgFromEeg(eeg, minSrate, low, high)
+%% Takes a given eeg signal and grabs and filters the ekg signal, returning
+%  only the ekg signal
+%  Parameters:
+%       eeg         the eeg signal
+%       minSrate    the minimum sampling rate
+%       low         the low pass filter
+%       high        the high pass filter
+%  Return value:
+%       the filtered ekg signal in an eeg struct
+%%
     if size(eeg.data, 1) ~= 63
         eeg = [];
         return;
