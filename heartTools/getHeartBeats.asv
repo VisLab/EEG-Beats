@@ -4,8 +4,6 @@
 %   getBeatRefinement
 %   Parameters:
 %       EEG     The EEG struct from EEGLab.
-%       minDist minimum distance between peaks in seconds
-%       maxDist maximum distance between peaks in seconds
 %       peaksIdx
 %               the peak indicies the algorithm finds
 %       peaksTm

@@ -117,7 +117,7 @@ for i = 1:numDataSets
 
     % Get the indicators
     try
-        [peaks, peaksTm] = getHeartBeats(eeg, ibiMinDist, ibiMaxDist);
+        [peaks, peaksTm] = getHeartBeats(eeg);
         ekgPeaks(i).peakTm = peaksTm(1,:);
         ekgPeaks(i).troughTm = peaksTm(2,:);
         
