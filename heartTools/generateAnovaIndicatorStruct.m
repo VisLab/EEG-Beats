@@ -63,7 +63,7 @@ ibiErrorSummary(numDataSets) = struct('session', NaN, 'filename', NaN, ...
     'tooLarge', NaN, 'tooSmall', NaN, 'errorMsg', NaN);
 
 % Populate the basic data
-for i = 1:20
+for i = 1:numDataSets
     % NaN it out
     ekgSignal(i) = ekgSignal(end);
     ekgPeaks(i) = ekgPeaks(end);
