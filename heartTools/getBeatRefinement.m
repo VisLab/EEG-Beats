@@ -200,7 +200,7 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         %% 
         % Set up the intervals.
         consensusIntervalIdx = consensusIntervalLen * srate;
-        numIntervals = min(length(ekg)/consensusIntervalIdx, 10);
+        numIntervals = min(length(ekg)/consensusIntervalIdx, 31);
         maxIntervalLenIdx = floor(length(ekg)/numIntervals);
         startIdx = zeros(1,numIntervals);
         
@@ -234,7 +234,7 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
         %% 
         % Set up the intervals
         consensusIntervalIdx = consensusIntervalLen * srate;
-        numIntervals = min(length(ekg)/consensusIntervalIdx, 10);
+        numIntervals = min(length(ekg)/consensusIntervalIdx, 31);
         maxIntervalLenIdx = floor(length(ekg)/numIntervals);
         startIdx = zeros(1,numIntervals);
         
@@ -449,14 +449,6 @@ peaksFinalTm = (peaksFinalIdx-1)/srate;
     %       result = notFeasible(firstBeatIdx, innerBeatBaseIdx, lastBeatIdx)
     %%
         innerBeatIdx = [innerBeatBaseIdx+firstBeatIdx-1, innerBeatBaseIdx+firstBeatIdx-1];
-        
-        % Ensure not an end point
-        %if (innerBeatBaseIdx == 1) || ...
-        %    (innerBeatBaseIdx + firstBeatIdx - 1 == lastBeatIdx) || ...
-        %    abs(lastBeatIdx-firstBeatIdx) < epsIdx
-        %    result = 1;
-        %    return
-        %end
         
         % innerBeatBaseIdx is two close to firstBeatIdx or lastBeatIdx
         if ~(minDistIdx < innerBeatBaseIdx-1) || ...
