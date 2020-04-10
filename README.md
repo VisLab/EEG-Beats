@@ -1,2 +1,4 @@
 # EEG-Heart
-Toolbox to extract heart rate indicators in MATLAB
+Toolbox to analyze heart rate variability (HRV) in conjunction with EEG
+
+
