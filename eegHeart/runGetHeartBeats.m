@@ -7,8 +7,8 @@
 
 %% Set the paths
 rawDataBaseDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
-ekgDataBase = 'D:\TestData\NCTU_RWN_VDE_IBIs_6';
-imageDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images6';
+ekgDataBase = 'D:\TestData\NCTU_RWN_VDE_IBIs_7';
+imageDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images7';
 
 params = struct();
 params.srate = 128;
@@ -50,38 +50,6 @@ if ~exist(ekgDataBase, 'dir')
 end
 fd = fopen([ekgDataBase filesep 'summary.txt'], 'w');
 
-% peaks 
-    % session, filename, srate
-    % start times of the peaks
-    % the corresponding troughs
-% ekgPeaks(numDataSets) = struct('session', NaN, 'filename', NaN, ...
-%     'srate', NaN, 'peakTime', NaN, 'troughTime', NaN);
-% 
-% ibiStatsSummary(numDataSets) = struct('session', NaN, 'level1Name', NaN, ...
-%     'subjectID', NaN, 'task', NaN, 'fatigue', NaN, 'mean', NaN, ...
-%     'sdnn', NaN, 'rmssd', NaN, 'nn50', NaN, 'pnn50', NaN, 'rrt', NaN);
-% 
-% ibiErrorSummary(numDataSets) = struct('session', NaN, 'filename', NaN, ...
-%     'tooLarge', NaN, 'tooSmall', NaN, 'errorMsg', NaN);
-
-% % Populate the basic data
-% for i = 1:numDataSets
-%     % NaN it out
-%     ekgSignal(i) = ekgSignal(end);
-%     ekgPeaks(i) = ekgPeaks(end);
-%     ibiStatsSummary(i) = ibiStatsSummary(end);
-%     ibiErrorSummary(i) = ibiErrorSummary(end);
-%     
-%     % Set some of the values
-%     ibiStatsSummary(i).level1Name = metadata(i).level1Name;
-%     ibiStatsSummary(i).subjectID = metadata(i).subjectID;
-%     ibiStatsSummary(i).session = metadata(i).session;
-%     ibiStatsSummary(i).task = metadata(i).task;
-%     ibiStatsSummary(i).fatigue = metadata(i).fatigue;
-%     ibiErrorSummary(i).session = metadata(i).session;
-%     ekgSignal(i).session = metadata(i).session;
-%     ekgPeaks(i).session = metadata(i).session;
-% end
 
 %% Get the indicators
 for n = 1:numFiles
@@ -213,47 +181,5 @@ for n = 1:numFiles
     end
     fprintf(fd, '\n');
 
-%     %% Remove the small extra peaks in each method
-%     peakPrts = prctile(ekg(peakFrames), [25, 50, 75]);
-%     ibis = peakFrames(2:end) - peakFrames(1:end-1);
-%     maxIbiFrames = round(params.ibiMaxSeconds.*params.srate);
-%     ibis(ibis > maxIbiFrames) = [];
-%     ibiPrts = prctile(ibis, [25, 50, 75]);
-%     peakMask = false(size(peakFrames));
-%     for k = 2:length(peakFrames) - 1
-%         d3 = peakFrames(k + 1) - peakFrames(k - 1);
-%         if d3 > maxIbiFrames
-%             continue;
-%         end
-%         d1 = abs(peakFrames(k) - peakFrames(k - 1) - ibiPrts(2));
-%         d2 = abs(peakFrames(k + 1) - peakFrames(k) - ibiPrts(2));
-%         if abs(d3 - ibiPrts(2)) < max(d1, d2)
-%             peakMask(k) = true;
-%         end
-%     end
-%     maskFrames = peakFrames(peakMask);
-%     hold on
-%     plot(seconds(maskFrames), EEG.data(maskFrames), 'kx', 'MarkerSize', 12);
-%     hold off
-%     fprintf(fd, '%d: %s %s\n', k, baseString, theName);
-%     fprintf('%d: %s %s\n', k, baseString, theName);
-    
-%     % set the indicators
-%     ibiStatsSummary(i).mean = indicators(1);
-%     ibiStatsSummary(i).sdnn = indicators(2);
-%     ibiStatsSummary(i).rmssd = indicators(3);
-%     ibiStatsSummary(i).nn50 = indicators(4);
-%     ibiStatsSummary(i).pnn50 = indicators(5);
-%     ibiStatsSummary(i).rrt = indicators(6);
 end
 fclose(fd);
-
-% %% Save
-% badData = badData(1:b);
-% ibiStatsSummary = ibiStatsSummary(validMask);
-% 
-% save(savePathIbI, 'ibiStatsSummary');
-% save(savePathError, 'ibiErrorSummary');
-% save(savePathPeaks, 'ekgPeaks');
-% save(savePathEkg, 'ekgSignal');
-% save(saveBadDataPath, 'badData');
