@@ -32,6 +32,7 @@
 function [ekgPeaks, com] = pop_eegbeats(EEG, params)
 com = ''; % Return something if user presses the cancel button
 okay = true;
+ekgPeaks = [];
 if nargin < 1  %% display help if not enough arguments
     help pop_eegbeats;
     return;
