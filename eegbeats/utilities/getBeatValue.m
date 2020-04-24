@@ -1,6 +1,6 @@
-function [beatValue, troughValue] = getBeatValue(signal, beatFrame, qrsFrames, threshold, twoSided)
+function [beatValue, troughValue] = getBeatValue(signal, beatFrame, qrsFrames, threshold, singlePeak)
 
-    if twoSided
+    if singlePeak
         beatValue = getTwoSidedValue(signal, beatFrame, threshold, qrsFrames);
         troughValue = [];
     else

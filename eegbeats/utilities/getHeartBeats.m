@@ -1,4 +1,4 @@
- function [peakFrames, flip, sigRight] = getHeartBeats(ekg, twoSided, params)
+ function [peakFrames, flip, sigRight] = getHeartBeats(ekg, singlePeak, params)
 % Find heartbeats in an ekg signal
 %  
 % Parameters:
@@ -20,14 +20,14 @@ ekgAll = ekg;
 %% First truncate signal so extreme peaks don't affect the result.
 % lowerMax = getAvgMin(ekg) - (params.stdTruncate*1.4826*mad(ekg,1));
 % upperMax = getAvgMax(ekg) + (params.stdTruncate*1.4826*mad(ekg,1));
-maxSignal = params.stdTruncate*1.4826*mad(ekg,1);
+maxSignal = params.truncateThreshold*1.4826*mad(ekg,1);
 ekg(ekg < -maxSignal) = -maxSignal;
 ekg(ekg > maxSignal) = maxSignal;
 
 % Convert the rate and the time to index sizes in an array
 minIBIFrames = max(round(params.ibiMinSeconds*params.srate), 1);
-flipIntervalFrames = round(params.flipIntervalLen * params.srate);
-threshold = params.stdThreshold*1.4826*mad(ekg,1);
+flipIntervalFrames = round(params.flipIntervalSeconds * params.srate);
+threshold = params.threshold*1.4826*mad(ekg,1);
 
 %% Determine whether or not to flip the ekg signal
 flip = getFlipDirection(ekg, flipIntervalFrames, threshold);
@@ -38,7 +38,7 @@ elseif flip > 0
 end
 
 %upperLargeThreshold = params.stdLargeThreshold*1.4826*mad(ekg,1);
-if ~twoSided
+if ~singlePeak
     sigRight = getTroughSide(ekg, flipIntervalFrames, qrsFrames, threshold);
 else
     sigRight = true;
@@ -55,7 +55,7 @@ maxFrames = initialParseIBI(ekg(innerRange), params.consensusIntervals, minIBIFr
 maxFrames = maxFrames + innerRange(1) - 1;
 
 for k = 1:length(maxFrames)
-    beatValue = getBeatValue(ekg, maxFrames(k), qrsFrames, threshold, twoSided);
+    beatValue = getBeatValue(ekg, maxFrames(k), qrsFrames, threshold, singlePeak);
     ekg = zeroOut(ekg, maxFrames(k), qrsFrames);
     if isempty(beatValue)
         maxFrames(k) = 0;
@@ -84,7 +84,7 @@ while (length(peaksIdx) > 1) %Loop while suspected peaks exist
         continue;
     end
 
-    beatValue = getBeatValue(thisSignal, tempIdx, qrsFrames, threshold, twoSided);
+    beatValue = getBeatValue(thisSignal, tempIdx, qrsFrames, threshold, singlePeak);
     if isempty(beatValue) || ...
        peaksIdx(1) ~= 1 && (peaksIdx(1) + minIBIFrames > beatFrame) || ...
        peaksIdx(2) ~= length(ekg) && (peaksIdx(2) - minIBIFrames < beatFrame) || ...
