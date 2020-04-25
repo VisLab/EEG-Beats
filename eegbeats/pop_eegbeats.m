@@ -29,7 +29,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ekgPeaks, com] = pop_eegbeats(EEG, params)
+function [ekgPeaks, ibistats, com] = pop_eegbeats(EEG, params)
 com = ''; % Return something if user presses the cancel button
 okay = true;
 ekgPeaks = [];
@@ -51,6 +51,20 @@ if (~okay)
 	return;
 end
 
+%% Check the parameters agains the defaults
+[params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
+ 
+%% Get the peaks and the figure
+[ekgPeaks, hFig, params] = eeg_beats(EEG, fileName, subName, params);
+
+       if ~isempty(plotDir)
+            saveas(hFig, [plotDir filesep subName '_' theName '.fig'], 'fig');
+            saveas(hFig, [plotDir filesep subName '_' theName '.png'], 'png');
+            if strcmpi(params.figureVisibility, 'off')
+                close(hFig)
+            end
+       end
+        
 %% Begin the pipeline execution
 % userData = getUserData();
 % com = sprintf('%s = pop_eegbeats(%s, %s);', inputname(1), ...

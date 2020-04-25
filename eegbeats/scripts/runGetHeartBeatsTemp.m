@@ -11,36 +11,46 @@
 
 %% Set the paths
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
-peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_11\ekgPeaks.mat';
+peakFileName = 'D:\TestData\NCTU_RWN_VDE_IBIs_11\ekgPeaks.mat';
 plotDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images_11';
 
 %% Set the base parameters (an empty structure uses the defaults)
 baseParams = struct();
-baseParams.figureVisibility = 'off';
+
 %% Get a list of all of the .set files in the directory tree of rawDir
 EEGFiles = getFileAndFolderList(rawDir, {'*.set'}, true);
 numFiles = length(EEGFiles);
 
+%% Create session map
+sessionMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
+for k = 1:numFiles
+    thePath = fileparts(EEGFiles{k});
+    pieces = strsplit(thePath, filesep);
+    sessionMap(pieces{end}) = k;
+end
 
-%% Make sure the directories exist
 if ~isempty(plotDir) && ~exist(plotDir, 'dir')
     mkdir(plotDir);
 end
-ekgDir = fileparts(peakFile);
 if ~isempty(ekgDir) && ~exist(ekgDir, 'dir')
     mkdir(ekgDir);
 end
 
 
 %% Set up the structure for saving the peak and ekg information
-ekgPeaks = getEmptyBeatStructs();
+ekgPeaks = getBeatStructs();
 ekgPeaks(numFiles) = ekgPeaks(1);
 
 %% Get the indicators
-for k = 1:numFiles
+for n = 1:5%:numFiles
+    nKey = num2str(n);
+    if ~isKey(sessionMap, nKey)
+        warning('Session %s does not have file', nKey);
+        continue;
+    end
+    k = sessionMap(nKey);
     EEG = pop_loadset(EEGFiles{k});
     
-    %% Split out the subdirectories to create names
     [thePath, theName, theExt] = fileparts(EEGFiles{k});
     subPath = thePath(length(rawDir) + 2:end);
     subPathSplit = strsplit(subPath, filesep);
@@ -52,8 +62,12 @@ for k = 1:numFiles
         end
     end
     params = baseParams;
-    [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());  
-    [ekgPeaks(k), hFig] = eeg_beats(EEG, theName, subName, params);
+    [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
+    if ~isempty(errors)
+        error('Bad parameters: %s error messages', length(errors));
+    end
+    
+    [ekgPeaks(n), hFig] = eeg_beats(EEG, theName, subName, params);
     
     %% Now save the information in the ekg file.
     if ~isempty(plotDir) && ~isempty(hFig)
@@ -67,5 +81,9 @@ end
 
 %% Save the information if requested
 if ~isempty(ekgDir)
-    save(peakFile, 'ekgPeaks', 'params', '-v7.3');
+    saveFile = [ekgDir filesep 'ekgPeaks.mat'];
+    save(saveFile, 'ekgPeaks', '-v7.3');
+end
+if fd > 1
+    fclose(fd);
 end

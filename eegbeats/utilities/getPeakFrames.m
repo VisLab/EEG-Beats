@@ -1,4 +1,4 @@
- function [peakFrames, flip, sigRight] = getHeartBeats(ekg, singlePeak, params)
+ function [peakFrames, flip, sigRight] = getPeakFrames(ekg, singlePeak, params)
 % Find heartbeats in an ekg signal
 %  
 % Parameters:
@@ -13,7 +13,7 @@
 % Use initialParseIBI to find a preliminary estimate of the peaks.
 % minimum qrs duration is how wide the peak should be
 peakFrames = []; sigRight = -1;
-qrsFrames = round(params.qrsDuration*params.srate);
+qrsHalfFrames = round(0.5*params.qrsDuration*params.srate./1000);
 ekg = ekg - median(ekg);
 ekgAll = ekg;
 
@@ -25,7 +25,7 @@ ekg(ekg < -maxSignal) = -maxSignal;
 ekg(ekg > maxSignal) = maxSignal;
 
 % Convert the rate and the time to index sizes in an array
-minIBIFrames = max(round(params.ibiMinSeconds*params.srate), 1);
+minIBIFrames = max(round(params.ibiMinMs*params.srate./1000), 1);
 flipIntervalFrames = round(params.flipIntervalSeconds * params.srate);
 threshold = params.threshold*1.4826*mad(ekg,1);
 
@@ -39,7 +39,7 @@ end
 
 %upperLargeThreshold = params.stdLargeThreshold*1.4826*mad(ekg,1);
 if ~singlePeak
-    sigRight = getTroughSide(ekg, flipIntervalFrames, qrsFrames, threshold);
+    sigRight = getTroughSide(ekg, flipIntervalFrames, qrsHalfFrames, threshold);
 else
     sigRight = true;
 end
@@ -50,13 +50,13 @@ elseif ~sigRight
 end
 
 %% Get the fencepost peaks and determine which are valid
-innerRange = (1 + qrsFrames):(length(ekg) - qrsFrames);
+innerRange = (1 + qrsHalfFrames):(length(ekg) - qrsHalfFrames);
 maxFrames = initialParseIBI(ekg(innerRange), params.consensusIntervals, minIBIFrames);
 maxFrames = maxFrames + innerRange(1) - 1;
 
 for k = 1:length(maxFrames)
-    beatValue = getBeatValue(ekg, maxFrames(k), qrsFrames, threshold, singlePeak);
-    ekg = zeroOut(ekg, maxFrames(k), qrsFrames);
+    beatValue = getBeatValue(ekg, maxFrames(k), qrsHalfFrames, threshold, singlePeak);
+    ekg = zeroOut(ekg, maxFrames(k), qrsHalfFrames);
     if isempty(beatValue)
         maxFrames(k) = 0;
     end
@@ -80,20 +80,20 @@ while (length(peaksIdx) > 1) %Loop while suspected peaks exist
     beatFrame = tempIdx + peaksIdx(1) - 1;
     if ekg(beatFrame) <  threshold
         peaksIdx = peaksIdx(2:end);
-        ekg = zeroOut(ekg, beatFrame, qrsFrames);
+        ekg = zeroOut(ekg, beatFrame, qrsHalfFrames);
         continue;
     end
 
-    beatValue = getBeatValue(thisSignal, tempIdx, qrsFrames, threshold, singlePeak);
+    beatValue = getBeatValue(thisSignal, tempIdx, qrsHalfFrames, threshold, singlePeak);
     if isempty(beatValue) || ...
        peaksIdx(1) ~= 1 && (peaksIdx(1) + minIBIFrames > beatFrame) || ...
        peaksIdx(2) ~= length(ekg) && (peaksIdx(2) - minIBIFrames < beatFrame) || ...
-       beatFrame - 2*qrsFrames < 0 || beatFrame + 2*qrsFrames > length(ekg)
+       beatFrame - 2*qrsHalfFrames < 0 || beatFrame + 2*qrsHalfFrames > length(ekg)
        valid = false;
     else
         valid = true;
     end
-    ekg = zeroOut(ekg, beatFrame, qrsFrames);
+    ekg = zeroOut(ekg, beatFrame, qrsHalfFrames);
     if valid
         peakMask(beatFrame) = 1;
         peaksIdx = [peaksIdx(1), beatFrame, peaksIdx(2:end)];
@@ -107,4 +107,4 @@ peakFrames = find(peakMask);
 if flip
     ekgAll = -ekgAll;
 end
-peakFrames = adjustPeaks(peakFrames, ekgAll, maxSignal, qrsFrames); 
+peakFrames = adjustPeaks(peakFrames, ekgAll, maxSignal, qrsHalfFrames); 
