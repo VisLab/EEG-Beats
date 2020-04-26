@@ -62,11 +62,12 @@ function [ekgPeaks, ibiInfo, com] = pop_eegbeats(EEG, params)
 
 %% Check the parameters agains the defaults
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
-if ~isfield(params, 'fileName') && ~isempty(EEG.filename)
+theName = '';
+if isfield(params, 'fileName') && ~isempty(params.fileName)
+    [~, theName] = fileparts(params.fileName);
+elseif ~isfield(params, 'fileName') && ~isempty(EEG.filename)
     [~, theName] = fileparts(EEG.filename);
     params.fileName = theName;
-else
-    theName = '';
 end
 
 
