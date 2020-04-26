@@ -2,8 +2,9 @@
 %
 % This finds all the EEG .set files in the directory tree rooted at rawDir
 % and extracts heartbeats for all of the files and saves in the file
-% peakFileName. The plotDir directory saves images of each ekg with peaks
-% marked if plotting is specified.
+% peakFile. The figureDir directory saves images of each ekg with peaks
+% marked if plotting is specified. Since doIBIMeasures is set to false,
+% no interbeat interval indicators are
 %
 % Execute outputBeatDefaults() to see the default parameters and their
 % values.
@@ -11,20 +12,23 @@
 
 %% Set the paths
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
-peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_11\ekgPeaks.mat';
-plotDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images_11';
+peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_12\ekgPeaks.mat';
+figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images_12';
 
 %% Set the base parameters (an empty structure uses the defaults)
 baseParams = struct();
 baseParams.figureVisibility = 'off';
+baseParams.doIBIMeasures = false;
+baseParams.figureDir = figureDir;
+
 %% Get a list of all of the .set files in the directory tree of rawDir
 EEGFiles = getFileAndFolderList(rawDir, {'*.set'}, true);
 numFiles = length(EEGFiles);
 
 
 %% Make sure the directories exist
-if ~isempty(plotDir) && ~exist(plotDir, 'dir')
-    mkdir(plotDir);
+if ~isempty(figureDir) && ~exist(figureDir, 'dir')
+    mkdir(figureDir);
 end
 ekgDir = fileparts(peakFile);
 if ~isempty(ekgDir) && ~exist(ekgDir, 'dir')
@@ -52,19 +56,9 @@ for k = 1:numFiles
         end
     end
     params = baseParams;
-    [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());  
-    [ekgPeaks(k), hFig] = eeg_beats(EEG, theName, subName, params);
-    
-    %% Now save the information in the ekg file.
-    if ~isempty(plotDir) && ~isempty(hFig)
-        saveas(hFig, [plotDir filesep subName theName '.fig'], 'fig');
-        saveas(hFig, [plotDir filesep subName theName '.png'], 'png');
-        if strcmpi(params.figureVisibility, 'off')
-            close(hFig)
-        end
-    end
+    params.fileName = [subName '_' theName];
+    ekgPeaks(k) = pop_eegbeats(EEG, params);
 end
-
 %% Save the information if requested
 if ~isempty(ekgDir)
     save(peakFile, 'ekgPeaks', 'params', '-v7.3');

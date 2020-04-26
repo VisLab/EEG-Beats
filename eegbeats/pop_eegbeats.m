@@ -87,8 +87,8 @@ if ~isempty(hFig)
         if ~exist(params.figureDir, 'dir')
             mkdir(params.figureDir);
         end
-        saveas(hFig, [params.figDir filesep theName '_ekgPeaks.fig'], 'fig');
-        saveas(hFig, [params.figDir filesep theName '_ekgPeaks.png'], 'png');
+        saveas(hFig, [params.figureDir filesep theName '_ekgPeaks.fig'], 'fig');
+        saveas(hFig, [params.figureDir filesep theName '_ekgPeaks.png'], 'png');
     end
     if strcmpi(params.figureVisibility, 'off')
         close(hFig)
