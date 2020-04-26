@@ -14,7 +14,7 @@ function [ekgPeaks, hFig] = eeg_beats(EEG, params)
     %% Now find the channel label
     channelMask = strcmpi({EEG.chanlocs.labels}, params.ekgChannelLabel);
     if sum(channelMask) == 0
-        warning('%s: does not have an EKG channel', egkPeaks.fileName);
+        warning('%s: does not have an EKG channel', EEG.filename);
         return;
     end
     EEG.data = EEG.data(channelMask, :);
