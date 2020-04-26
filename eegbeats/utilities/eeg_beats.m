@@ -1,17 +1,20 @@
-function [ekgPeaks, hFig] = eeg_beats(EEG, fileName, subName, params)
+function [ekgPeaks, hFig] = eeg_beats(EEG, params)
 
     %% Set up the return values
     ekgPeaks = getEmptyBeatStructs();
     hFig = [];
   
-    ekgPeaks.fileName = fileName;
-    ekgPeaks.subName = subName;
+    if isfield(params, 'fileName')
+       ekgPeaks.fileName = params.fileName;
+    else
+       ekgPeaks.fileName = 'Unknown source';
+    end
     ekgPeaks.srate = params.srate;
     
     %% Now find the channel label
     channelMask = strcmpi({EEG.chanlocs.labels}, params.ekgChannelLabel);
     if sum(channelMask) == 0
-        warning('%s: %s does not have an EKG channel', fileName, subName);
+        warning('%s: does not have an EKG channel', egkPeaks.fileName);
         return;
     end
     EEG.data = EEG.data(channelMask, :);
@@ -28,8 +31,8 @@ function [ekgPeaks, hFig] = eeg_beats(EEG, fileName, subName, params)
     % Calculate the heart beats for two different methods
     [peakFrames, flip, sigRight] = getPeakFrames(EEG.data, false, params);
     peakSingleFrames = getPeakFrames(EEG.data, true, params);
-    baseString = sprintf('%s: peak-trough:%d, single-peak:%d, intersect:%d, flip:%d, sigRight:%d', ...
-            subName, length(peakFrames), length(peakSingleFrames), ...
+    baseString = sprintf('Initially: peak-trough:%d, single-peak:%d, intersect:%d, flip:%d, sigRight:%d', ...
+            length(peakFrames), length(peakSingleFrames), ...
             length(intersect(peakFrames, peakSingleFrames)), flip, sigRight);
     fprintf('%s\n', baseString);
    
@@ -67,10 +70,10 @@ function [ekgPeaks, hFig] = eeg_beats(EEG, fileName, subName, params)
   
     %% Plot the data if requested
     if params.doPlot
-        baseString = sprintf(['%s: peak-trough:%d, single:%d, ' ...
+        baseString = sprintf(['peak-trough:%d, single:%d, ' ...
             'intersect:%d, combined: %d, unmatched: %d, flip:%d, sigRight:%d'], ...
-            subName, length(peakFrames), length(peakSingleFrames), ...
+            length(peakFrames), length(peakSingleFrames), ...
             length(intersect(peakFrames, peakSingleFrames)), ...
             length(peaksCombined), length(peaksRest), flip, sigRight);
-        hFig = makePeakPlot(EEG.data, peaksCombined, {fileName; baseString}, params);
+        hFig = makePeakPlot(EEG.data, peaksCombined, {ekgPeaks.fileName; baseString}, params);
     end

@@ -5,7 +5,7 @@
 % peakFileName. The plotDir directory saves images of each ekg with peaks
 % marked if plotting is specified.
 %
-% Execute showBeatDefaults() to see the default parameters and their
+% Execute outputBeatDefaults() to see the default parameters and their
 % values.
 %
 

@@ -1,14 +1,15 @@
-% pop_eegbeats() - calculates and analyzes heartbeats from EEG/EKG signals
+% pop_eegbeats() - analyzes heart rate variability from an ekg/eeg sensor
 %
 % Usage:
-%   >>   [peaks, com] = pop_eegbeats(INEEG, params);
+%   >>   [ekgPeaks, ibiInfo, com] = pop_eegbeats(INEEG, params);
 %
 % Inputs:
 %   INEEG   - input EEG dataset
 %   params  - (optional) structure with parameters to override defaults
 %
 % Outputs:
-%   peaks - output dataset
+%   ekgPeaks - structure containing the extracted ekg and detected beats
+%   ibiInfo  - structure containing interbeat interval metrics 
 %
 % See also:
 %   runGetHeartBeats, getHeartBeats, EEGLAB
@@ -29,83 +30,72 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ekgPeaks, ibistats, com] = pop_eegbeats(EEG, params)
-com = ''; % Return something if user presses the cancel button
-okay = true;
-ekgPeaks = [];
-if nargin < 1  %% display help if not enough arguments
-    help pop_eegbeats;
-    return;
-elseif nargin < 2
-    params = struct();
-end
+function [ekgPeaks, ibiInfo, com] = pop_eegbeats(EEG, params)
+%% Initialize the return values
+    com = ''; % Return something if user presses the cancel button
+    ekgPeaks = struct();
+    ibiInfo = struct();
+    okay = true;
+    
+%% Pop up a dialog if needed
+    if nargin < 1  %% display help if not enough arguments
+        help(mfilename);
+        return;
+    elseif isempty(EEG.data)
+        warndlg2('The EEG file must be loaded first', ...
+            [mfilename '(): Dataset is empty!'])
+        return
+    elseif size(EEG.data, 3) > 1 % data is epoched
+        warndlg2('eegbeats requires continuous (unepoched) EEG data', ...
+            [mfilename '(): Dataset is epoched!'])
+        return
+    elseif nargin < 2
+        %[params, okay] = dlg_eegbeats(getBeatDefaults());
+        [params, okay] = dlg_eegbeats(getBlinkerDefaults(EEG));
+    end
 
-%% Pop up window
-if nargin < 2
-    userData = getUserData();
-    [params, okay] = MasterGUI([],[],userData, EEG);
-end
+    %% Return if user pressed cancel or if bad parameters
+    if (~okay)
+        return;
+    end
 
-%% Return if user pressed cancel
-if (~okay) 
-	return;
-end
 
 %% Check the parameters agains the defaults
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
- 
-%% Get the peaks and the figure
-[ekgPeaks, hFig, params] = eeg_beats(EEG, fileName, subName, params);
+if ~isfield(params, 'fileName') && ~isempty(EEG.filename)
+    [~, theName] = fileparts(EEG.filename);
+    params.fileName = theName;
+else
+    theName = '';
+end
 
-       if ~isempty(plotDir)
-            saveas(hFig, [plotDir filesep subName '_' theName '.fig'], 'fig');
-            saveas(hFig, [plotDir filesep subName '_' theName '.png'], 'png');
-            if strcmpi(params.figureVisibility, 'off')
-                close(hFig)
-            end
-       end
-        
-%% Begin the pipeline execution
-% userData = getUserData();
-% com = sprintf('%s = pop_eegbeats(%s, %s);', inputname(1), ...
-%     struct2str(params));
-% 
-% reportMode = userData.report.reportMode.value;
-% consoleFID = userData.report.consoleFID.value;
-% publishOn = userData.report.publishOn.value;
-% summaryFilePath = userData.report.summaryFilePath.value;
-% sessionFilePath = userData.report.sessionFilePath.value;
-% 
-% if okay
-%     if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
-%         EEG = prepPipeline(EEG, params);
-%     end
-%     if (strcmpi(reportMode, 'normal') || ...
-%             strcmpi(reportMode, 'reportOnly')) %&& publishOn
-%         publishPrepReport(EEG, summaryFilePath, sessionFilePath, ...
-%             consoleFID, publishOn);
-%     end
-%     if strcmpi(reportMode, 'normal') || strcmpi(reportMode, 'skipReport')
-%         EEG = prepPostProcess(EEG, params);
-%     end
-% end
-% 
-%     function userData = getUserData()
-%         %% Gets the userData defaults and merges it with the parameters
-%         userData = struct('boundary', [], 'detrend', [], ...
-%             'lineNoise', [], 'reference', [], ...
-%             'report', [],  'postProcess', []);
-%         stepNames = fieldnames(userData);
-%         for k = 1:length(stepNames)
-%             defaults = getPrepDefaults(EEG, stepNames{k});
-%             [theseValues, errors] = checkStructureDefaults(params, ...
-%                 defaults);
-%             if ~isempty(errors)
-%                 error('pop_prepPipeline:BadParameters', ['|' ...
-%                     sprintf('%s|', errors{:})]);
-%             end
-%             userData.(stepNames{k}) = theseValues;
-%         end
-%     end  % getUserData
 
+%% Now get the peaks and save things if necessary
+[ekgPeaks, hFig] = eeg_beats(EEG, params);
+ibiInfo = eeg_ekgstats(ekgPeaks, params);
+
+if ~isempty(params.fileDir)
+    if ~exist(params.fileDir, 'dir')
+            mkdir(params.fileDir);
+     end
+     save([params.fileDir filesep theName '_ekgPeaks.mat'], 'ekgPeaks', 'params', '-v7.3');
+     save([params.fileDir filesep theName '_ibiInfo.mat'], 'ibiInfo', 'params', '-v7.3');
+end
+
+if ~isempty(hFig)
+    if ~isempty(params.figureDir)
+        if ~exist(params.figureDir, 'dir')
+            mkdir(params.figureDir);
+        end
+        saveas(hFig, [params.figDir filesep theName '_ekgPeaks.fig'], 'fig');
+        saveas(hFig, [params.figDir filesep theName '_ekgPeaks.png'], 'png');
+    end
+    if strcmpi(params.figureVisibility, 'off')
+        close(hFig)
+    end
+end
+
+
+%% Now set the com string
+ com = sprintf('pop_params(%s, %s);', inputname(1), struct2str(params));
 end % pop_eegbeats

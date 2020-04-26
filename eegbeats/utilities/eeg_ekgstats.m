@@ -2,7 +2,6 @@ function ibiInfo = eeg_ekgstats(ekgPeaks, params)
 
     [~, ibiInfo, ibiMeasures] = getEmptyBeatStructs();
     ibiInfo.fileName = ekgPeaks.fileName;
-    ibiInfo.subName = ekgPeaks.subName;
     ekg = ekgPeaks.ekg;
     srate = ekgPeaks.srate;
     ekgMins = length(ekg)/60.0/srate;
