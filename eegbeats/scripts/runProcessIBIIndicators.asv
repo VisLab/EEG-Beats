@@ -1,9 +1,8 @@
-%% Script to calculate IBI indicators
+%% Script to calculate IBI m
 
 %% Set the files
-ekgFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_11\ekgPeaks.mat';
-metaFile = 'D:\TestData\NCTU_RWN_VDE_Heart\meta.mat';
-ibiFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_11\ibiMeasures.mat';
+ekgFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_12\ekgPeaks.mat';
+ibiFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_12\ibiInfo.mat';
 
 %% Set up the structure templates
 [~, ibiInfo, ibiMeasures] = getEmptyBeatStructs();

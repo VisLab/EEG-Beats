@@ -30,7 +30,7 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ekgPeaks, ibiInfo, com] = pop_eegbeats(EEG, params)
+function [ekgPeaks, ibiInfo, params, com] = pop_eegbeats(EEG, params)
 %% Initialize the return values
     com = ''; % Return something if user presses the cancel button
     ekgPeaks = struct();
@@ -98,5 +98,5 @@ end
 
 
 %% Now set the com string
- com = sprintf('pop_params(%s, %s);', inputname(1), struct2str(params));
+com = sprintf('pop_params(%s, %s);', inputname(1), struct2str(params));
 end % pop_eegbeats
