@@ -12,9 +12,9 @@
 
 %% Set the paths
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
-peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_13\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_13\ibiInfo.mat';
-figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images_13';
+peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_15\ekgPeaks.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_15\rrInfo.mat';
+figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images_15';
 
 %% Set the base parameters (an empty structure uses the defaults)
 baseParams = struct();
@@ -24,7 +24,6 @@ baseParams.figureDir = figureDir;
 %% Get a list of all of the .set files in the directory tree of rawDir
 EEGFiles = getFileAndFolderList(rawDir, {'*.set'}, true);
 numFiles = length(EEGFiles);
-
 
 %% Make sure the directories exist
 if ~isempty(figureDir) && ~exist(figureDir, 'dir')
@@ -40,9 +39,9 @@ if ~isempty(infoDir) && ~exist(infoDir, 'dir')
 end
 
 %% Set up the structure for saving the peak and ekg information
-[ekgPeaks, ibiInfo] = getEmptyBeatStructs();
+[ekgPeaks, RRInfo] = getEmptyBeatStructs();
 ekgPeaks(numFiles) = ekgPeaks(1);
-ibiInfo(numFiles) = ibiInfo(1);
+RRInfo(numFiles) = RRInfo(1);
 %% Get the indicators
 for k = 1:numFiles
     EEG = pop_loadset(EEGFiles{k});
@@ -59,8 +58,14 @@ for k = 1:numFiles
         end
     end
     params = baseParams;
+    [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
+    if ~isempty(errors)
+        s = join(errors(:));
+        warning('dataset %d: failed due to invalid parameters %s', k, s{1});
+        continue;
+    end
     params.fileName = [subName '_' theName];
-    [ekgPeaks(k), ibiInfo(k), params] = pop_eegbeats(EEG, params);
+    [ekgPeaks(k), RRInfo(k), params] = pop_eegbeats(EEG, params);
 end
 %% Save the information if requested
 if ~isempty(peakFile)
@@ -68,5 +73,5 @@ if ~isempty(peakFile)
 end
 
 if ~isempty(infoFile) 
-    save(infoFile, 'ibiInfo', 'params', '-v7.3');
+    save(infoFile, 'RRInfo', 'params', '-v7.3');
 end

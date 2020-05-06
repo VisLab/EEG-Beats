@@ -30,11 +30,11 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-function [ekgPeaks, ibiInfo, params, com] = pop_eegbeats(EEG, params)
+function [ekgPeaks, rrInfo, params, com] = pop_eegbeats(EEG, params)
 %% Initialize the return values
     com = ''; % Return something if user presses the cancel button
     ekgPeaks = struct();
-    ibiInfo = struct();
+    rrInfo = struct();
     okay = true;
     
 %% Pop up a dialog if needed
@@ -73,14 +73,14 @@ end
 
 %% Now get the peaks and save things if necessary
 [ekgPeaks, hFig] = eeg_beats(EEG, params);
-ibiInfo = eeg_ekgstats(ekgPeaks, params);
+rrInfo = eeg_ekgstats(ekgPeaks, params);
 
 if ~isempty(params.fileDir)
     if ~exist(params.fileDir, 'dir')
             mkdir(params.fileDir);
      end
      save([params.fileDir filesep theName '_ekgPeaks.mat'], 'ekgPeaks', 'params', '-v7.3');
-     save([params.fileDir filesep theName '_ibiInfo.mat'], 'ibiInfo', 'params', '-v7.3');
+     save([params.fileDir filesep theName '_rrInfo.mat'], 'rrInfo', 'params', '-v7.3');
 end
 
 if ~isempty(hFig)

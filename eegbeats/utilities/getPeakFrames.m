@@ -25,7 +25,7 @@ ekg(ekg < -maxSignal) = -maxSignal;
 ekg(ekg > maxSignal) = maxSignal;
 
 % Convert the rate and the time to index sizes in an array
-minIBIFrames = max(round(params.ibiMinMs*params.srate./1000), 1);
+minRRFrames = max(round(params.RRMinMs*params.srate./1000), 1);
 flipIntervalFrames = round(params.flipIntervalSeconds * params.srate);
 threshold = params.threshold*1.4826*mad(ekg,1);
 
@@ -51,7 +51,7 @@ end
 
 %% Get the fencepost peaks and determine which are valid
 innerRange = (1 + qrsHalfFrames):(length(ekg) - qrsHalfFrames);
-maxFrames = initialParseIBI(ekg(innerRange), params.consensusIntervals, minIBIFrames);
+maxFrames = initialParseIBI(ekg(innerRange), params.consensusIntervals, minRRFrames);
 maxFrames = maxFrames + innerRange(1) - 1;
 
 for k = 1:length(maxFrames)
@@ -86,8 +86,8 @@ while (length(peaksIdx) > 1) %Loop while suspected peaks exist
 
     beatValue = getBeatValue(thisSignal, tempIdx, qrsHalfFrames, threshold, singlePeak);
     if isempty(beatValue) || ...
-       peaksIdx(1) ~= 1 && (peaksIdx(1) + minIBIFrames > beatFrame) || ...
-       peaksIdx(2) ~= length(ekg) && (peaksIdx(2) - minIBIFrames < beatFrame) || ...
+       peaksIdx(1) ~= 1 && (peaksIdx(1) + minRRFrames > beatFrame) || ...
+       peaksIdx(2) ~= length(ekg) && (peaksIdx(2) - minRRFrames < beatFrame) || ...
        beatFrame - 2*qrsHalfFrames < 0 || beatFrame + 2*qrsHalfFrames > length(ekg)
        valid = false;
     else

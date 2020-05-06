@@ -23,7 +23,7 @@ end
 
 %% Create the new structure
 numFiles = length(metadata);
-meta = struct('fileName', NaN, 'subName', NaN, 'subject', NaN, ...
+meta = struct('fileName', NaN, 'subject', NaN, ...
               'group', NaN, 'gender', NaN, 'task', NaN, ...
               'replicate', NaN, 'date', NaN);
 meta(numFiles) = meta(1);
@@ -33,10 +33,10 @@ for k = 1:numFiles
     session = num2str(metadata(k).session);
     if ~isKey(sessionMap, session)
         warning('Session %s does not have an entry in the session key', session);
-    else
-        meta(k).fileName = sessionMap(session);
+        continue;
     end
-    meta(k).subName = ['session_' num2str(metadata(k).session)];
+    fileName = sessionMap(session);
+    meta(k).fileName = ['session_' num2str(metadata(k).session) '_' fileName];
     meta(k).subject = metadata(k).subjectInfo.labId;
     meta(k).group = metadata(k).fatigue;
     meta(k).gender = metadata(k).subjectInfo.gender;

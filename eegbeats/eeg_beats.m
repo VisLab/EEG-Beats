@@ -42,32 +42,33 @@ function [ekgPeaks, hFig] = eeg_beats(EEG, params)
     end
     
     %% Perform alignment of nearby peaks from two methods
-    minIbiFrames = round(params.ibiMinMs.*params.srate./1000.0);
-    [peakFrames, peakSingleFrames] = alignMethodFrames(ekg, peakFrames, peakSingleFrames, minIbiFrames);
+    minRRFrames = round(params.RRMinMs.*params.srate./1000.0);
+    [peakFrames, peakSingleFrames] = alignMethodFrames(ekg, peakFrames, peakSingleFrames, minRRFrames);
      if params.verbose
         fprintf('----after alignment: peak-trough:%d, two-sided:%d, intersect:%d\n', ...
             length(peakFrames), length(peakSingleFrames), length(intersect(peakFrames, peakSingleFrames)));
      end
     
     %% Remove extra peaks in each representation individually
-    maxIbiFrames = round(params.ibiMaxMs.*params.srate./1000);
-    peakFrames = removeExtraPeaks(ekg, peakFrames, maxIbiFrames);
-    peakSingleFrames = removeExtraPeaks(ekg, peakSingleFrames, maxIbiFrames);
+    maxRRFrames = round(params.RRMaxMs.*params.srate./1000);
+    peakFrames = removeExtraPeaks(ekg, peakFrames, maxRRFrames);
+    peakSingleFrames = removeExtraPeaks(ekg, peakSingleFrames, maxRRFrames);
     if params.verbose
         fprintf('----after removal: peak-trough:%d, two-sided:%d, intersect:%d\n', ...
             length(peakFrames), length(peakSingleFrames), length(intersect(peakFrames, peakSingleFrames)));
     end  
     
     %% Combine the peaks from the two methods
-    [peaksCombined, peaksRest] = combineMethodPeaks(peakFrames, peakSingleFrames, minIbiFrames);
+    [peaksCombined, peaksRest] = combineMethodPeaks(peakFrames, peakSingleFrames, minRRFrames);
     if params.verbose
         fprintf('----after combination: peaks:%d, peaks left:%d\n', ...
             length(peaksCombined), length(peaksRest));
         fprintf('\n');
     end
      
-    ekgPeaks.peakFrames = peaksCombined;
-  
+    if ~isempty(peaksCombined)
+        ekgPeaks.peakFrames = peaksCombined;
+    end
     %% Plot the data if requested
     if params.doPlot
         baseString = sprintf(['peak-trough:%d, single:%d, ' ...
