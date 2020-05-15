@@ -12,15 +12,15 @@
 
 %% Set the paths
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
-peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_15\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_15\rrInfo.mat';
-figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images_15';
+peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\ekgPeaks.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\rrInfo.mat';
+figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images';
 
 %% Set the base parameters (an empty structure uses the defaults)
 baseParams = struct();
-baseParams.figureVisibility = 'off';
+baseParams.figureVisibility = 'on';
 baseParams.figureDir = figureDir;
-
+baseParams.figureClose = true;
 %% Get a list of all of the .set files in the directory tree of rawDir
 EEGFiles = getFileAndFolderList(rawDir, {'*.set'}, true);
 numFiles = length(EEGFiles);

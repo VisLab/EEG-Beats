@@ -114,23 +114,28 @@ for k = 1:length(rrMeasureTypes)
             thisMeta = {metadata.(metaVariables{g})};
             groups = thisMeta(rrPositions);
             groups = groups(taskMask);
+            
+            pValues = nan(length(rrMeasures), length(metaVariables));
             for m = 1:length(rrMeasures)
                 theseValues = rrScaledValues(:, m);
                 valueMask = ~isnan(theseValues);
                 theseValues = theseValues(valueMask);
                 theseGroups = groups(valueMask);
-                fprintf('%s: %s has %d nans\n', metaVariables{g}, rrMeasures{m}, sum(~valueMask));
-                
-                %% Now plot the box plot
-                baseTitle = {[rrMeasures{m} ' ' rrMeasureTypes{k} ' grouped by '  ...
-                      metaVariables{g}]; scalingString};
-                hFig = makeFactorBoxplot(theseValues, theseGroups, ...
-                                rrMeasures{m}, metaVariables{g}, baseTitle, scalingLine);
-                saveName = [rrMeasures{m} '_groupedBy_' metaVariables{g} '_' ...
-                    rrMeasureTypes{k} '_Scaling_' rrScalingTypes{s}];
-                saveFigures(hFig, [plotDir filesep saveName], figFormats, figClose);
+                [p, theTable, theStats] = anova1(theseValues, theseGroups, 'on');   
             end
         end
     end
 end
 
+
+      %% Calculate aNova for subject versus hand
+    
+    [p, theTable, theStats] = anovan(theseIndicators, {subject, hand},...
+        'display', 'off', 'varnames', {subjectInd, 'hand'});
+    b = baseStruct;
+    b.ibiIndex = indicatorType{k};
+    b.aNovaType = 'Subject-Hand';
+    b.p = p;
+    b.pTable = theTable;
+    b.pStats = theStats;
+    pValues{k,2} = b;

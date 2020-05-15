@@ -33,8 +33,7 @@
 function [ekgPeaks, rrInfo, params, com] = pop_eegbeats(EEG, params)
 %% Initialize the return values
     com = ''; % Return something if user presses the cancel button
-    ekgPeaks = struct();
-    rrInfo = struct();
+    [ekgPeaks, rrInfo] = getEmptyBeatStructs();
     okay = true;
     
 %% Pop up a dialog if needed
@@ -62,6 +61,14 @@ function [ekgPeaks, rrInfo, params, com] = pop_eegbeats(EEG, params)
 
 %% Check the parameters agains the defaults
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
+if ~isempty(errors)
+    warning('pop_eegbeats failed due to invalid input parameters')
+    for k = 1:length(errors)
+        fprintf('%s\n', errors{k});
+    end
+    return;
+end
+    
 theName = '';
 if isfield(params, 'fileName') && ~isempty(params.fileName)
     [~, theName] = fileparts(params.fileName);
@@ -91,7 +98,7 @@ if ~isempty(hFig)
         saveas(hFig, [params.figureDir filesep theName '_ekgPeaks.fig'], 'fig');
         saveas(hFig, [params.figureDir filesep theName '_ekgPeaks.png'], 'png');
     end
-    if strcmpi(params.figureVisibility, 'off')
+    if strcmpi(params.figureVisibility, 'off') || params.figureClose
         close(hFig)
     end
 end

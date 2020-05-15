@@ -1,5 +1,5 @@
 function hFig = makePeakPlot(ekg, peakFrames, plotTitle, params)   
-
+%% Creates a figure of the ekg overlaid with the peaks that it found
 
    
     peakPrts = prctile(ekg(peakFrames), [25, 50, 75]);
