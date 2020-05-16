@@ -127,12 +127,15 @@ for k = 1:length(rrMeasureTypes)
          
             for m = 1:length(rrMeasures)
                 theseValues = rrScaledValues(:, m);
-                valueMask = ~isnan(theseValues);
+                valueMask = ~isnan(theseValues) & ~isinf(theseValues);
                 theseValues = theseValues(valueMask);
                 theseGroups = groups(valueMask);
-                [pValues(m, g), theTable] = anova1(theseValues, theseGroups, 'off');  
+                [pValues(m, g), theTable] = anova1(theseValues(:), theseGroups(:), 'off');  
                 fValues(m, g) = theTable{2, 5};
                 df(m, g) = theTable{2, 3};
+                if isnan(pValues(m, g))
+                    pause;
+                end
             end
       
         end
