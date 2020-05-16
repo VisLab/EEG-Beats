@@ -1,4 +1,4 @@
-# EEG-Heart
+# EEG-Beats
 Toolbox to analyze heart rate variability (HRV) in conjunction with EEG
 
 This toolbox extracts heartbeat peaks and interbeat interval measures
