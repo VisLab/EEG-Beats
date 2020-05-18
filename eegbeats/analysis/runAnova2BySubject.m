@@ -1,4 +1,4 @@
-%% Run n-way analysis of variance on pairs of models
+%% Run n-way analysis of variance on pairs of factors broken down by subject
 
 
 %% Set the file names
@@ -15,9 +15,7 @@ rrMeasures = {'meanHR', 'meanRR', 'medianRR', 'SDNN', 'SDSD', 'RMSSD', ...
 rrMeasureTypes = {'overallValues', 'blockValues'};
 rrScalingTypes = {'None', 'Subtract', 'Divide'};
 scalingTask = 'Pre_EXP_resting';
-%figFormats = {'.png', 'png'; '.fig', 'fig'; '.pdf' 'pdf'; '.eps', 'epsc'};
-figFormats = {'.png', 'png'};
-figClose = true;
+
 
 %% Make sure that the plot directory exists
 if ~isempty(analysisDir) && ~exist(analysisDir, 'dir')
@@ -69,15 +67,10 @@ rrInfo(metaIndex == 0) = [];
 
 subjects = {metadata.('subject')};
 uniqueSubjects = unique(subjects);
-%% Plot the box plots
-template = struct('subject', NaN, 'metaVariables', NaN, ...
-                    'rrMeasures', NaN, 'scaling', NaN,  'measureType', NaN, ...
-                     'pValues', NaN, 'fValues', NaN, 'df', NaN);
-numCombos = length(metaVariables)*(length(metaVariables) - 1)/2;
-numCases = length(rrMeasureTypes)*length(rrScalingTypes)*length(uniqueSubjects);
-anova2Info(1) = template;
-anova2Info(numCases*numCombos) = template;
-count = 0;
+
+%% Perform and consolidate the Anovas
+aMapBySubject = containers.Map('KeyType', 'char', 'ValueType', 'any');
+
 for k = 1:length(rrMeasureTypes)
     [rrValues, rrPositions] = ...
         consolidateRRMeasures(rrInfo, rrMeasureTypes{k}, rrMeasures);
@@ -123,9 +116,6 @@ for k = 1:length(rrMeasureTypes)
         subjects = subjects(:);
         subjects = subjects(taskMask);
 
-        pValues = [];
-        fValues = [];
-        df = [];
         for u = 1:length(uniqueSubjects)
             subjectMask = strcmpi(subjects, uniqueSubjects{u});
             for g1 = 1:length(metaVariables)
@@ -141,14 +131,25 @@ for k = 1:length(rrMeasureTypes)
                     if ~isfield(metadata, metaVariables{g1}) || g1 == g2
                         continue;
                     end
+                    thisKey = [rrMeasureTypes{k} '_' rrScalingTypes{s} ...
+                            ':' metaVariables{g1} '_', metaVariables{g2}];
+                    if isKey(aMapBySubject, thisKey)
+                        thisMap = aMapBySubject(thisKey);
+                        pValues = thisMap{1};
+                        fValues = thisMap{2};
+                        dfs = thisMap{3};
+                    else
+                        pValues =  ...
+                            NaN(length(uniqueSubjects), 3, length(rrMeasures));
+                        fValues = pValues;
+                        dfs = pValues;
+                    end
+                            
                     thisMeta2 = {metadata.(metaVariables{g2})};
                     groups2 = thisMeta2(rrPositions);
                     groups2 = groups2(taskMask);
                     groups2 = groups2(subjectMask);
                     
-                    thesePValues = nan(length(rrMeasures), 3);
-                    theseFValues = nan(length(rrMeasures), 3);
-                    theseDFs = nan(length(rrMeasures), 3);
                     for m = 1:length(rrMeasures)
                         fprintf('%s %s %s %s %s %s\n', uniqueSubjects{u}, ...
                             rrMeasures{m}, ...
@@ -160,34 +161,98 @@ for k = 1:length(rrMeasureTypes)
                         theseGroups1 = groups1(valueMask);
                         theseGroups2 = groups2(valueMask);
                         try
-                        [thePValues, theTable] =  anovan(theseValues(:), ...
-                            {theseGroups1(:), theseGroups2(:)}, ...
-                            'model', 'interaction', 'display', 'off', ...
-                            'varnames', {metaVariables{g1}, metaVariables{g2}});
-                        thesePValues(m, :) = thePValues(:)';
-                        theseFValues(m, :) = ...
-                            [theTable{2, 6}, theTable{3, 6}, theTable{4, 6}];
-                        theseDFs(m, :) = ...
-                            [theTable{2, 3}, theTable{3, 3}, theTable{4, 3}];
-                        catch
-                            warning('Could not compute anova');
+                            [thePValues, theTable] =  anovan(theseValues(:), ...
+                                {theseGroups1(:), theseGroups2(:)}, ...
+                                'model', 'interaction', 'display', 'off', ...
+                                'varnames', {metaVariables{g1}, metaVariables{g2}});
+                            pValues(u, :, m) = thePValues(:)';
+                            fValues(u, :, m) = ...
+                                [theTable{2, 6}, theTable{3, 6}, theTable{4, 6}];
+                            dfs(u, :, m) = ...
+                                [theTable{2, 3}, theTable{3, 3}, theTable{4, 3}];
+                        catch Mex
+                            warning(Mex.identifier, 'Could not compute anova %s', Mex.message);
                         end
                     end
                     
-                    count = count + 1;
-                    anova2Info(count) = template;
-                    anova2Info(count).subject = uniqueSubjects{u};
-                    anova2Info(count).metaVariables = metaVariables([g1, g2]);
-                    anova2Info(count).rrMeasures = rrMeasures;
-                    anova2Info(count).scaling = rrScalingTypes{s};
-                    anova2Info(count).measureType = rrMeasureTypes{k};
-                    anova2Info(count).pValues = thesePValues;
-                    anova2Info(count).fValues = theseFValues;
-                    anova2Info(count).df = theseDFs;
+                    aMapBySubject(thisKey) = {pValues, fValues, dfs};
                 end
             end
         end
     end
 end
+
+
+%% Now create as a structure
+template = struct('type', NaN, 'measure', NaN, 'subject', NaN, ...
+    'factor1', NaN, 'factor2', NaN);
+
+for s = 1:length(rrScalingTypes)
+    template.([rrScalingTypes{s} '_1_p']) = NaN;
+    template.([rrScalingTypes{s} '_2_p']) = NaN;
+    template.([rrScalingTypes{s} '_1x2_p']) = NaN;
+end
+for s = 1:length(rrScalingTypes)
+    template.([rrScalingTypes{s} '_1_F']) = NaN;
+    template.([rrScalingTypes{s} '_2_F']) = NaN;
+    template.([rrScalingTypes{s} '_1x2_F']) = NaN;
+end
+for s = 1:length(rrScalingTypes)
+    template.([rrScalingTypes{s} '_1_df']) = NaN;
+    template.([rrScalingTypes{s} '_2_df']) = NaN;
+    template.([rrScalingTypes{s} '_1x2_df']) = NaN;
+end
+numCombos = length(metaVariables)*(length(metaVariables) - 1)/2;
+anova2InfoBySubject(1) = template;
+totalVals = numCombos*length(rrMeasureTypes)*length(rrMeasures)*length(uniqueSubjects);
+anova2InfoBySubject(totalVals) = template;
+count = 0;
+for k = 1:length(rrMeasureTypes)
+    for g1 = 1:length(metaVariables)
+        for g2 = g1+1:length(metaVariables)
+            theseValues = {};
+            for s = 1:length(rrScalingTypes)
+                thisKey = [rrMeasureTypes{k} '_' rrScalingTypes{s} ...
+                    ':' metaVariables{g1} '_', metaVariables{g2}];
+                if ~isKey(aMapBySubject, thisKey)
+                    break;
+                end
+                theseValues{s} = aMapBySubject(thisKey); %#ok<*SAGROW>
+            end
+            if isempty(theseValues)
+                break;
+            end
+            for m = 1:length(rrMeasures)
+                for u = 1:length(uniqueSubjects)
+                    count = count + 1;
+                    tStruct = template;
+                    tStruct.type = rrMeasureTypes{k};
+                    tStruct.measure = rrMeasures{m};
+                    tStruct.subject = uniqueSubjects{u};
+                    tStruct.factor1 = metaVariables{g1};
+                    tStruct.factor2 = metaVariables{g2};
+                    for s = 1:length(rrScalingTypes)
+                        theValues = theseValues{s};
+                        pValues = theValues{1};
+                        fValues = theValues{2};
+                        dfValues = theValues{3};
+                        
+                        tStruct.([rrScalingTypes{s} '_1_p']) = pValues(u, 1, m);
+                        tStruct.([rrScalingTypes{s} '_2_p']) = pValues(u, 2, m);
+                        tStruct.([rrScalingTypes{s} '_1x2_p']) = pValues(u, 3, m);
+                        tStruct.([rrScalingTypes{s} '_1_F']) = fValues(u, 1, m);
+                        tStruct.([rrScalingTypes{s} '_2_F']) = fValues(u, 2, m);
+                        tStruct.([rrScalingTypes{s} '_1x2_F']) = fValues(u, 3, m);
+                        tStruct.([rrScalingTypes{s} '_1_df']) = dfValues(u, 1, m);
+                        tStruct.([rrScalingTypes{s} '_2_df']) = dfValues(u, 2, m);
+                        tStruct.([rrScalingTypes{s} '_1x2_df']) = dfValues(u, 3, m);
+                    end
+                    anova2InfoBySubject(count) = tStruct;
+                end
+            end
+        end
+    end
+end
+                       
 %% Save the measures
-save([analysisDir filesep 'anova2Measures.mat'], 'anova2Info', '-v7.3');
+save([analysisDir filesep 'anova2BySubjectMeasures.mat'], 'anova2InfoBySubject', 'aMapBySubject', '-v7.3');
