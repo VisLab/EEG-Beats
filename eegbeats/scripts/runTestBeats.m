@@ -5,8 +5,8 @@
 %             length(intersect(peakFrames, peakSingleFrames)), ...
 %             length(peaksCombined), length(peaksRest), flip, sigRight);
 
-ekgFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_new\ekgPeaks.mat';
-rrInfoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_new\rrInfo.mat';
+ekgFile = 'D:\TestData\NCTU_RWN_VDE_IBI_Data\ekgPeaks.mat';
+rrInfoFile = 'D:\TestData\NCTU_RWN_VDE_IBI_Data\rrInfo.mat';
 
 temp = load(ekgFile);
 ekgPeaks = temp.ekgPeaks;
