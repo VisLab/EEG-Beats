@@ -1,4 +1,4 @@
-function [peakFrames, peakTwoFrames] = alignMethodFrames(ekg, peakFrames, peakTwoFrames, minIbiFrames)   
+function [peakFrames, peakTwoFrames] = alignMethodFrames(ekg, peakFrames, peakTwoFrames, minRRFrames)   
 
 
     peakMask = zeros(1, length(ekg));
@@ -14,7 +14,7 @@ function [peakFrames, peakTwoFrames] = alignMethodFrames(ekg, peakFrames, peakTw
         if peakAllMask(p1) == 3 || peakAllMask(p1) == 0 || ...
            peakAllMask(p2) == 3 || peakAllMask(p2) == 0 || ...
            peakAllMask(p1) == peakAllMask(p2) || ...
-           p1 == p2 || p2 - p1  >= minIbiFrames
+           p1 == p2 || p2 - p1  >= minRRFrames
             continue;
         end
         if ekg(p1) > ekg(p2)

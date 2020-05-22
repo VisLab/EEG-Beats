@@ -49,23 +49,23 @@ function [ekgPeaks, rrInfo, params, com] = pop_eegbeats(EEG, params)
             [mfilename '(): Dataset is epoched!'])
         return
     elseif nargin < 2
-        %[params, okay] = dlg_eegbeats(getBeatDefaults());
-        [params, okay] = dlg_eegbeats(getBlinkerDefaults(EEG));
+       [params, okay] = dlg_eegbeats(getBeatDefaults());
+       [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
+       if ~isempty(errors)
+           warndlg2(['Invalid parameters: ' cell2str(errors)]);
+           return;
+       end
     end
 
     %% Return if user pressed cancel or if bad parameters
-    if (~okay)
+    if (~okay) 
         return;
     end
 
-
-%% Check the parameters agains the defaults
+%% Check the parameters against the defaults
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
 if ~isempty(errors)
-    warning('pop_eegbeats failed due to invalid input parameters')
-    for k = 1:length(errors)
-        fprintf('%s\n', errors{k});
-    end
+    warning(['pop_eegbeats has invalid input parameters' cell2str(errors)]);
     return;
 end
     
@@ -79,8 +79,8 @@ end
 
 
 %% Now get the peaks and save things if necessary
-[ekgPeaks, hFig] = eeg_beats(EEG, params);
-rrInfo = eeg_ekgstats(ekgPeaks, params);
+[ekgPeaks, params, hFig] = eeg_beats(EEG, params);
+[rrInfo, params] = eeg_ekgstats(ekgPeaks, params);
 
 if ~isempty(params.fileDir)
     if ~exist(params.fileDir, 'dir')

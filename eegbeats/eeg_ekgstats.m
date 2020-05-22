@@ -1,7 +1,12 @@
-function RRInfo = eeg_ekgstats(ekgPeaks, params)
+function [rrInfo, params] = eeg_ekgstats(ekgPeaks, params)
 
-    [~, RRInfo, RRMeasures] = getEmptyBeatStructs();
-    RRInfo.fileName = ekgPeaks.fileName;
+    [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
+    if ~isempty(errors)
+        error(['eeg_ekgstats has invalid input parameters' cell2str(errors)]);
+    end
+
+    [~, rrInfo, RRMeasures] = getEmptyBeatStructs();
+    rrInfo.fileName = ekgPeaks.fileName;
   
     ekg = ekgPeaks.ekg;
     if isempty(ekgPeaks.ekg) || ...
@@ -13,22 +18,22 @@ function RRInfo = eeg_ekgstats(ekgPeaks, params)
     srate = ekgPeaks.srate;
     ekgMinutes = length(ekg)/60.0/srate;
     peakFrames = ekgPeaks.peakFrames;
-    RRInfo.fileMinutes = ekgMinutes;
-    RRInfo.blockMinutes = min(ekgMinutes, params.RRBlockMinutes);
+    rrInfo.fileMinutes = ekgMinutes;
+    rrInfo.blockMinutes = min(ekgMinutes, params.rrBlockMinutes);
     
-    RRInfo.overallValues = getRRMeasures(peakFrames, RRInfo.fileMinutes, params);
-    RRInfo.blockStepMinutes = min(ekgMinutes, params.RRBlockStepMinutes);
-    numBlocks = floor((ekgMinutes - RRInfo.blockMinutes)/RRInfo.blockStepMinutes)+ 1;
+    rrInfo.overallValues = getRRMeasures(peakFrames, rrInfo.fileMinutes, params);
+    rrInfo.blockStepMinutes = min(ekgMinutes, params.rrBlockStepMinutes);
+    numBlocks = floor((ekgMinutes - rrInfo.blockMinutes)/rrInfo.blockStepMinutes)+ 1;
     blockM = RRMeasures;
     blockM(numBlocks) = blockM(1);
     startFrame = 1;
-    blockFrames = round(RRInfo.blockMinutes*60*srate);
-    blockStep = round(RRInfo.blockStepMinutes*60*srate);
+    blockFrames = round(rrInfo.blockMinutes*60*srate);
+    blockStep = round(rrInfo.blockStepMinutes*60*srate);
     for n = 1:numBlocks
         endFrame = startFrame + blockFrames - 1;
         thesePeaks = peakFrames(startFrame <= peakFrames & peakFrames <= endFrame);
-        blockM(n) = getRRMeasures(thesePeaks, RRInfo.blockMinutes, params);
+        blockM(n) = getRRMeasures(thesePeaks, rrInfo.blockMinutes, params);
         blockM(n).startMinutes = (startFrame - 1)/60/srate;
         startFrame = startFrame + blockStep;
     end
-    RRInfo.blockValues = blockM;
+    rrInfo.blockValues = blockM;

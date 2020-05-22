@@ -1,4 +1,4 @@
-function maxFrames = initialParseIBI(signal, consensusIntervals, minIBIFrames)
+function maxFrames = initialParseRR(signal, consensusIntervals, minRRFrames)
 %% Find a small number of suspected R peaks in the ekg as fenceposts
 %
 %   Parameters: 
@@ -13,6 +13,6 @@ function maxFrames = initialParseIBI(signal, consensusIntervals, minIBIFrames)
     [~, maxFrames] = max(eSignal, [], 1);
     frameIncrement = ((1:consensusIntervals) - 1)* boxSize;
     maxFrames = maxFrames + frameIncrement;
-    diffMask = (maxFrames(2:end) - maxFrames(1:end - 1)) < minIBIFrames;
+    diffMask = (maxFrames(2:end) - maxFrames(1:end - 1)) < minRRFrames;
     maxFrames([false, diffMask]) = [];
 end

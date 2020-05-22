@@ -1,4 +1,4 @@
-function [peakCombined, peakLeft] = combineMethodPeaks(peakFrames, peakTwoFrames, minIbiFrames)     
+function [peakCombined, peakLeft] = combineMethodPeaks(peakFrames, peakTwoFrames, minRRFrames)     
 
     if length(peakFrames) < length(peakTwoFrames)
         peakCombined = peakTwoFrames;
@@ -18,7 +18,7 @@ function [peakCombined, peakLeft] = combineMethodPeaks(peakFrames, peakTwoFrames
         frontPeaks = peakRest(1:lastInd);
         peakRest = peakRest(lastInd + 1:end);
         for k = length(frontPeaks):1
-            if peakCombined(1) - frontPeaks(k) > minIbiFrames
+            if peakCombined(1) - frontPeaks(k) > minRRFrames
                 peakCombined = [frontPeaks(k) peakCombined];
             else
                 peakLeft = [peakLeft frontPeaks(k)];
@@ -31,7 +31,7 @@ function [peakCombined, peakLeft] = combineMethodPeaks(peakFrames, peakTwoFrames
         backPeaks = peakRest(firstInd:end);
         peakRest = peakRest(1:firstInd - 1);
         for k = 1: length(backPeaks)
-            if backPeaks(k) -  peakCombined(end) >=  minIbiFrames
+            if backPeaks(k) -  peakCombined(end) >=  minRRFrames
                 peakCombined = [peakCombined, backPeaks(k)]; %#ok<*AGROW>
             else
                 peakLeft = [peakLeft backPeaks(k)];
@@ -49,8 +49,8 @@ function [peakCombined, peakLeft] = combineMethodPeaks(peakFrames, peakTwoFrames
          if isempty(lastInd)
              continue;
          end
-         if peakRest(k) - peakCombined(lastInd - 1) >= minIbiFrames && ...
-             peakCombined(lastInd) - peakRest(k) >= minIbiFrames
+         if peakRest(k) - peakCombined(lastInd - 1) >= minRRFrames && ...
+             peakCombined(lastInd) - peakRest(k) >= minRRFrames
              peakCombined = [peakCombined(1:lastInd - 1), peakRest(k) ...       
                              peakCombined(lastInd:end)];
          else

@@ -5,27 +5,25 @@ peakFile  = 'D:\TestData\NCTU_RWN_VDE_IBIs\ekgPeaks.mat';
 infoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\rrInfo.mat';
 
 %% Set up the structure templates
-[~, ibiInfo, ibiMeasures] = getEmptyBeatStructs();
+[~, rrInfo, rrMeasures] = getEmptyBeatStructs();
 
 %% Load the heartbeat peaks
 temp = load(ekgFile);
 ekgPeaks = temp.ekgPeaks;
+params = temp.params;
 numFiles = length(ekgPeaks);
 
 %% Initialize the structure
-ibiInfo(numFiles) = ibiInfo(1);
-params = struct();
+rrInfo(numFiles) = rrInfo(1);
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
 if ~isempty(errors)
-        error('Bad parameters: %s error messages', length(errors));
+   error(['Bad parameters: ' cell2str(errors)]);
 end
 
 %% Now step through each file and compute the indicators
 for k = 1%:numFiles
-    %% Set the file names in the structure
-    ibiInfo(k) = ibiInfo(end);
-    ibiInfo(k) = eeg_ekgstats(ekgPeaks(k), params);
+    [rrInfo(k), params] = eeg_ekgstats(ekgPeaks(k), params);
 end 
 
 %% Save the ibiInfo file
-%save(ibiFile, 'ibiInfo', 'params', '-v7.3');
+save(infoFile, 'rrInfo', 'params', '-v7.3');

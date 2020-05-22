@@ -12,19 +12,17 @@
 
 %% Set the paths
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
-peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_12\ekgPeaks.mat';
-figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images_12';
+peakFile = 'D:\TestData\NCTU_RWN_VDE_IBI_Data\ekgPeaks.mat';
+figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images_New1';
 
 %% Set the base parameters (an empty structure uses the defaults)
 baseParams = struct();
-baseParams.figureVisibility = 'off';
-baseParams.doIBIMeasures = false;
+baseParams.figureVisibility = 'on';
 baseParams.figureDir = figureDir;
 
 %% Get a list of all of the .set files in the directory tree of rawDir
 EEGFiles = getFileAndFolderList(rawDir, {'*.set'}, true);
 numFiles = length(EEGFiles);
-
 
 %% Make sure the directories exist
 if ~isempty(figureDir) && ~exist(figureDir, 'dir')
@@ -41,7 +39,7 @@ ekgPeaks = getEmptyBeatStructs();
 ekgPeaks(numFiles) = ekgPeaks(1);
 
 %% Get the indicators
-for k = 1:numFiles
+for k = 1%:numFiles
     EEG = pop_loadset(EEGFiles{k});
     
     %% Split out the subdirectories to create names
@@ -57,8 +55,9 @@ for k = 1:numFiles
     end
     params = baseParams;
     params.fileName = [subName '_' theName];
-    ekgPeaks(k) = pop_eegbeats(EEG, params);
+    [ekgPeaks(k), params, hFig] = eeg_beats(EEG, params);
 end
+
 %% Save the information if requested
 if ~isempty(ekgDir)
     save(peakFile, 'ekgPeaks', 'params', '-v7.3');

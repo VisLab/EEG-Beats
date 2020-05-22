@@ -8,16 +8,19 @@ metaFile = 'D:\TestData\NCTU_RWN_VDE_Heart\meta.mat';
 plotDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Analysis\boxplots';
 
 %% Set the parameters
-metaVariables = {'subject', 'group', 'task'};
-rrMeasures = {'meanHR', 'meanRR', 'medianRR', 'SDNN', 'SDSD', 'RMSSD', ...
-              'NN50', 'pNN50', 'totalPower', 'VLF', 'LF', 'LFnu', 'LFHFRatio'};
-rrMeasureTypes = {'overallValues', 'blockValues'};
+%metaVariables = {'subject', 'group', 'task'};
+metaVariables = {'subject'};
+% rrMeasures = {'meanHR', 'meanRR', 'medianRR', 'SDNN', 'SDSD', 'RMSSD', ...
+%               'NN50', 'pNN50', 'totalPower', 'VLF', 'LF', 'LFnu', 'LFHFRatio'};
+rrMeasures = {'LFnu'};
+%rrMeasureTypes = {'overallValues', 'blockValues'};
+rrMeasureTypes = {'blockValues'};
 rrScalingTypes = {'None', 'Subtract', 'Divide'};
 scalingTask = 'Pre_EXP_resting';
-%figFormats = {'.png', 'png'; '.fig', 'fig'; '.pdf' 'pdf'; '.eps', 'epsc'};
-figFormats = {'.png', 'png'};
-figClose = true;
-
+figFormats = {'.png', 'png'; '.fig', 'fig'; '.pdf' 'pdf'; '.eps', 'epsc'};
+%figFormats = {'.png', 'png'};
+%figClose = true;
+figClose = false;
 %% Make sure that the plot directory exists
 if ~isempty(plotDir) && ~exist(plotDir, 'dir')
     mkdir(plotDir)

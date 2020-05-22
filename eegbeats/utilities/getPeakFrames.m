@@ -13,7 +13,7 @@
 % Use initialParseIBI to find a preliminary estimate of the peaks.
 % minimum qrs duration is how wide the peak should be
 peakFrames = []; sigRight = -1;
-qrsHalfFrames = round(0.5*params.qrsDuration*params.srate./1000);
+qrsHalfFrames = round(0.5*params.qrsDurationMs*params.srate./1000);
 ekg = ekg - median(ekg);
 ekgAll = ekg;
 
@@ -25,7 +25,7 @@ ekg(ekg < -maxSignal) = -maxSignal;
 ekg(ekg > maxSignal) = maxSignal;
 
 % Convert the rate and the time to index sizes in an array
-minRRFrames = max(round(params.RRMinMs*params.srate./1000), 1);
+minRRFrames = max(round(params.rrMinMs*params.srate./1000), 1);
 flipIntervalFrames = round(params.flipIntervalSeconds * params.srate);
 threshold = params.threshold*1.4826*mad(ekg,1);
 
@@ -51,7 +51,7 @@ end
 
 %% Get the fencepost peaks and determine which are valid
 innerRange = (1 + qrsHalfFrames):(length(ekg) - qrsHalfFrames);
-maxFrames = initialParseIBI(ekg(innerRange), params.consensusIntervals, minRRFrames);
+maxFrames = initialParseRR(ekg(innerRange), params.consensusIntervals, minRRFrames);
 maxFrames = maxFrames + innerRange(1) - 1;
 
 for k = 1:length(maxFrames)

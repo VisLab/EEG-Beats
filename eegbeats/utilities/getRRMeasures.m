@@ -21,7 +21,7 @@ function RRMeasures = getRRMeasures(peakFrames, blockMinutes, params)
     
     %% See if we should remove out of range RRs
     if params.removeOutOfRangeRRs
-        badRRMask = RRs < params.RRMinMs | RRs > params.RRMaxMs;
+        badRRMask = RRs < params.rrMinMs | RRs > params.rrMaxMs;
         RRs = RRs(~badRRMask);
         frames = frames(~badRRMask);
         RRMeasures.numBadRRs = sum(badRRMask);
