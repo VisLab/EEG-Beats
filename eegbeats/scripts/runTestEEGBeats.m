@@ -12,14 +12,15 @@
 
 %% Set the paths
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
-peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\ekgPeaks.mat';
-figureDir = 'D:\TestData\NCTU_RWN_VDE_Heart_Images';
-
+%peakFile = 'D:\TestData\NCTU_RWN_VDE_IBI_Data\ekgPeaks.mat';
+%figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images';
+peakFile = '';
+figureDir = '';
 %% Set the base parameters (an empty structure uses the defaults)
 baseParams = struct();
 baseParams.figureVisibility = 'on';
 baseParams.figureDir = figureDir;
-baseParams.figureClose = true;
+baseParams.figureClose = false;
 
 %% Get a list of all of the .set files in the directory tree of rawDir
 EEGFiles = getFileAndFolderList(rawDir, {'*.set'}, true);
@@ -34,13 +35,26 @@ if ~isempty(ekgDir) && ~exist(ekgDir, 'dir')
     mkdir(ekgDir);
 end
 
-
+%% Create session map
+sessionMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
+for k = 1:numFiles
+    [thePath, theName] = fileparts(EEGFiles{k});
+    pieces = strsplit(theName, '_');
+    sessionMap(pieces{6}) = k;
+end
+ 
 %% Set up the structure for saving the peak and ekg information
 ekgPeaks = getEmptyBeatStructs();
 ekgPeaks(numFiles) = ekgPeaks(1);
 
 %% Get the indicators
-for k = 1:numFiles
+for n = 34%:numFiles
+    nKey = num2str(n);
+    if ~isKey(sessionMap, nKey)
+        warning('Session %s does not have file', nKey);
+        continue;
+    end
+    k = sessionMap(nKey);
     EEG = pop_loadset(EEGFiles{k});
     
     %% Split out the subdirectories to create names
@@ -56,7 +70,7 @@ for k = 1:numFiles
     end
     params = baseParams;
     params.fileName = [subName '_' theName];
-    [ekgPeaks(k), params] = eeg_beats(EEG, params);
+    [ekgPeaks(k), params, hFig1, hFig] = eeg_beats(EEG, params);
 end
 
 %% Save the information if requested

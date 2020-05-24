@@ -1,8 +1,8 @@
 %% Script to calculate IBI measures from an existing peaks summary
 
 %% Set the files
-ekgFile = 'D:\TestData\NCTU_RWN_VDE_IBI_Data\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_IBI_Data\rrInfo.mat';
+ekgFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\ekgPeaks.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\rrInfo.mat';
 
 %% Set up the structure templates
 [~, rrInfo, rrMeasures] = getEmptyBeatStructs();

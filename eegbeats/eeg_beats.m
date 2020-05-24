@@ -1,8 +1,9 @@
-function [ekgPeaks, params, hFig] = eeg_beats(EEG, params)
+function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
 
     %% Set up the return values
     ekgPeaks = getEmptyBeatStructs();
-    hFig = [];
+    hFig1 = [];
+    hFig2 = [];
     
     params = checkBeatDefaults(params, params, getBeatDefaults());
   
@@ -53,47 +54,62 @@ function [ekgPeaks, params, hFig] = eeg_beats(EEG, params)
     
     %% Remove extra peaks in each representation individually
     maxRRFrames = round(params.rrMaxMs.*params.srate./1000);
-    peakFrames = removeExtraPeaks(ekg, peakFrames, maxRRFrames);
-    peakSingleFrames = removeExtraPeaks(ekg, peakSingleFrames, maxRRFrames);
+    peakFramesReduced = removeExtraPeaks(ekg, peakFrames, maxRRFrames, ...
+         params.minPeakAmpRatio);
+    peakSingleFramesReduced = removeExtraPeaks(ekg, peakSingleFrames, ...
+        maxRRFrames, params.minPeakAmpRatio);
     if params.verbose
         fprintf('----after removal: peak-trough:%d, two-sided:%d, intersect:%d\n', ...
-            length(peakFrames), length(peakSingleFrames), length(intersect(peakFrames, peakSingleFrames)));
+            length(peakFramesReduced), length(peakSingleFramesReduced), ...
+            length(intersect(peakFramesReduced, peakSingleFramesReduced)));
     end  
     
-    %% Combine the peaks from the two methods
-    [peaksCombined, peaksRest] = combineMethodPeaks(peakFrames, peakSingleFrames, minRRFrames);
+    %% Combine the peaks from the two methods and consider low amp peaks
+    [peaksCombined, peaksRest] = combineMethodPeaks(peakFramesReduced, peakSingleFramesReduced, minRRFrames);
+    [peaksCombinedFinal, lowAmplitudePeaks] = removeExtraPeaks(ekg, ...
+        peaksCombined, maxRRFrames,  params.minPeakAmpRatio);
     if params.verbose
         fprintf('----after combination: peaks:%d, peaks left:%d\n', ...
             length(peaksCombined), length(peaksRest));
+        fprintf('----after final cleanup: peaks:%d\n', length(peaksCombinedFinal));
+        if ~isempty(lowAmplitudePeaks)
+           fprintf('----low amplitude peaks after cleanup: peaks:%d\n', length(lowAmplitudePeaks));
+        end
         fprintf('\n');
     end
      
-    if ~isempty(peaksCombined)
-        ekgPeaks.peakFrames = peaksCombined;
+    if ~isempty(peaksCombinedFinal)
+        ekgPeaks.peakFrames = peaksCombinedFinal;
+        ekgPeaks.lowAmplitudePeaks = lowAmplitudePeaks;
     end
     %% Plot the data if requested
-    if params.doPlot
+    if params.doPlot 
         baseString = sprintf(['peak-trough:%d, single:%d, ' ...
-            'intersect:%d, combined: %d, unmatched: %d, flip:%d, sigRight:%d'], ...
+            'intersect:%d, combined: %d, cleaned: %d, unmatched: %d, flip:%d, sigRight:%d'], ...
             length(peakFrames), length(peakSingleFrames), ...
             length(intersect(peakFrames, peakSingleFrames)), ...
-            length(peaksCombined), length(peaksRest), flip, sigRight);
-        hFig = makePeakPlot(EEG.data, peaksCombined, {ekgPeaks.fileName; baseString}, params);
+            length(peaksCombined),  length(peaksCombinedFinal), ...
+            length(peaksRest), flip, sigRight);
+        hFig1 = makePeakPlot(ekgPeaks, baseString, params);
+        hFig2 = makePeakDistributionPlot(ekgPeaks, baseString, params);
     end
     
     %% Save the figure if required
-    if isempty(hFig) 
+    if isempty(hFig1) 
         return;
     end
     if ~isempty(params.figureDir)
         if ~exist(params.figureDir, 'dir')
             mkdir(params.figureDir);
         end
-        saveas(hFig, [params.figureDir filesep params.fileName '_ekgPeaks.fig'], 'fig');
-        saveas(hFig, [params.figureDir filesep params.fileName '_ekgPeaks.png'], 'png');
+        saveas(hFig1, [params.figureDir filesep params.fileName '_ekgPeaks.fig'], 'fig');
+        saveas(hFig1, [params.figureDir filesep params.fileName '_ekgPeaks.png'], 'png');
+        saveas(hFig2, [params.figureDir filesep params.fileName '_rrVsPeaks.fig'], 'fig');
+        saveas(hFig2, [params.figureDir filesep params.fileName '_RRVsPeaks.png'], 'png');
     end
     if strcmpi(params.figureVisibility, 'off') || params.figureClose
-        close(hFig)
+        close(hFig1)
+        close(hFig2)
     end
 
 end

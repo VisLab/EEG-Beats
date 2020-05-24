@@ -1,4 +1,4 @@
-   function ekg = zeroOut(ekg, peakFrame, qrsFrames)
+   function ekg = zeroOut(ekg, peakFrame, qrsHalfFrames)
      %% Zero out the surrounding signal around suspected R peaks.
      %
      %  Parameters:
@@ -11,7 +11,7 @@
      %      ekg = zeroOut(ekg, peaksidx, below, above, srate)
      %%
  
-     firstIdx = max(1, peakFrame - qrsFrames); %Max between 1 and tb-below
-     lastIdx = min(peakFrame + qrsFrames, length(ekg)); 
+     firstIdx = max(1, peakFrame - qrsHalfFrames); %Max between 1 and tb-below
+     lastIdx = min(peakFrame + qrsHalfFrames, length(ekg)); 
      ekg(firstIdx: lastIdx) = 0;
  

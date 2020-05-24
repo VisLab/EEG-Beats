@@ -1,15 +1,15 @@
-function [beatValue, troughValue] = getBeatValue(signal, beatFrame, qrsFrames, threshold, singlePeak)
+function [beatValue, troughValue] = getBeatValue(signal, beatFrame, qrsHalfFrames, threshold, singlePeak)
 
     if singlePeak
-        beatValue = getTwoSidedValue(signal, beatFrame, threshold, qrsFrames);
+        beatValue = getTwoSidedValue(signal, beatFrame, threshold, qrsHalfFrames);
         troughValue = [];
     else
-        rightPart = round(beatFrame:min(beatFrame + 2*qrsFrames, length(signal)));
-        [beatValue, troughValue] = determineIfPeakHasTrough(signal(rightPart), threshold, qrsFrames);
+        rightPart = round(beatFrame:min(beatFrame + 2*qrsHalfFrames, length(signal)));
+        [beatValue, troughValue] = determineIfPeakHasTrough(signal(rightPart), threshold, qrsHalfFrames);
     end
 end
     
-       function beatValue = getTwoSidedValue(ekg, beatFrame, qrsFrames, threshold)
+       function beatValue = getTwoSidedValue(ekg, beatFrame, qrsHalfFrames, threshold)
         %% Determine if the value at the peak is actually a peak
         % 
         % Parameters:
@@ -21,8 +21,8 @@ end
         %                           1 = validPeak,0 = invalidPeak
         %
         %%
-        maskLeft = ekg(round(max(1, beatFrame - qrsFrames) :(beatFrame - 1))) <= 0;
-        maskRight = ekg(round((beatFrame + 1):min(beatFrame + qrsFrames, length(ekg)))) <= 0;
+        maskLeft = ekg(round(max(1, beatFrame - qrsHalfFrames):(beatFrame - 1))) <= 0;
+        maskRight = ekg(round((beatFrame + 1):min(beatFrame + qrsHalfFrames, length(ekg)))) <= 0;
         valid = (ekg(beatFrame) > threshold) && sum(maskLeft) > 0 && sum(maskRight) > 0;
         if valid
             beatValue = ekg(beatFrame);

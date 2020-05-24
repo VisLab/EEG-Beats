@@ -16,11 +16,13 @@ peakFrames = []; sigRight = -1;
 qrsHalfFrames = round(0.5*params.qrsDurationMs*params.srate./1000);
 ekg = ekg - median(ekg);
 ekgAll = ekg;
+ekgFlip = fliplr(ekgAll);
+ekgFlip = -ekgFlip;
 
 %% First truncate signal so extreme peaks don't affect the result.
 % lowerMax = getAvgMin(ekg) - (params.stdTruncate*1.4826*mad(ekg,1));
 % upperMax = getAvgMax(ekg) + (params.stdTruncate*1.4826*mad(ekg,1));
-maxSignal = params.truncateThreshold*1.4826*mad(ekg,1);
+maxSignal = params.truncateThreshold*1.4826*mad(ekg, 1);
 ekg(ekg < -maxSignal) = -maxSignal;
 ekg(ekg > maxSignal) = maxSignal;
 
@@ -73,6 +75,11 @@ peaksIdx = [1, maxFrames, length(ekg)];
 peakMask = false(1, length(ekg));
 peakMask(maxFrames) = true;
 
+% figure
+% hold on
+% plot(ekgFlip);
+% indsA = 1:length(ekg);
+
 %% Get the other peaks
 while (length(peaksIdx) > 1) %Loop while suspected peaks exist
     thisSignal = ekg(peaksIdx(1):peaksIdx(2));
@@ -83,12 +90,13 @@ while (length(peaksIdx) > 1) %Loop while suspected peaks exist
         ekg = zeroOut(ekg, beatFrame, qrsHalfFrames);
         continue;
     end
+   
 
     beatValue = getBeatValue(thisSignal, tempIdx, qrsHalfFrames, threshold, singlePeak);
+   % plot(beatFrame, ekgFlip(beatFrame), 'r*');
     if isempty(beatValue) || ...
        peaksIdx(1) ~= 1 && (peaksIdx(1) + minRRFrames > beatFrame) || ...
-       peaksIdx(2) ~= length(ekg) && (peaksIdx(2) - minRRFrames < beatFrame) || ...
-       beatFrame - 2*qrsHalfFrames < 0 || beatFrame + 2*qrsHalfFrames > length(ekg)
+       peaksIdx(2) ~= length(ekg) && (peaksIdx(2) - minRRFrames < beatFrame) 
        valid = false;
     else
         valid = true;

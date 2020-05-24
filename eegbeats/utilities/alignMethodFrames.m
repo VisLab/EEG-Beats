@@ -1,10 +1,9 @@
 function [peakFrames, peakTwoFrames] = alignMethodFrames(ekg, peakFrames, peakTwoFrames, minRRFrames)   
-
+%% Align peak frames
 
     peakMask = zeros(1, length(ekg));
     peakTwoMask = peakMask;
     peakMask(peakFrames) = 1;
-    
     peakTwoMask(peakTwoFrames) = 2;
     peakAllMask = peakMask + peakTwoMask;
     peakAll = find(peakAllMask > 0);
