@@ -33,7 +33,9 @@ function RRMeasures = getRRMeasures(peakFrames, blockMinutes, params)
     RRMeasures.numRRs = length(RRs);
     RRMeasures.meanRR = mean(RRs);
     RRMeasures.medianRR = median(RRs);
-    
+    RRMeasures.skewRR = skewness(RRs);
+    RRMeasures.kurtosisRR = kurtosis(RRs);
+    RRMeasures.iqrRR = iqr(RRs);
     if (params.detrendOrder > 0)
         dRRs = detrend(RRs, params.detrendOrder, 'SamplePoints', ts);
         zdiff = RRs - dRRs;

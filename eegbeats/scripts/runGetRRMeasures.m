@@ -2,7 +2,7 @@
 
 %% Set the files
 ekgFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\rrInfo.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\rrInfoNew.mat';
 
 %% Set up the structure templates
 [~, rrInfo, rrMeasures] = getEmptyBeatStructs();
