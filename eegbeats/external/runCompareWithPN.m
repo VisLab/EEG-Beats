@@ -26,7 +26,7 @@ dMat = pdist2(peakFrames1(:), peakFrames2(:));
 fprintf('%d eegbeats peaks and %d PN peaks\n', ...
         length(peakFrames1), length(peakFrames2));
 fprintf('%d eegbeats peaks not zero dist from PN peaks\n', sum(minValues1~=0));
-fprintf('%d PN peaks not zero dist from PN peaks\n', sum(minValues2~=0));
+fprintf('%d PN peaks not zero dist from eegbeat peaks\n', sum(minValues2~=0));
 fprintf('Distances eegBeats to closest PN: %s\n', count2str(minValues1));
 fprintf('Distances PN to closest eegBeats %s\n', count2str(minValues2));
 

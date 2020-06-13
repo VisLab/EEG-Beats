@@ -19,6 +19,7 @@ rrInfo(numFiles) = rrInfo(1);
 if ~isempty(errors)
    error(['Bad parameters: ' cell2str(errors)]);
 end
+params.rrBlockStepMinutes = 0.5;
 
 %% Now step through each file and compute the indicators
 for k = 1:numFiles

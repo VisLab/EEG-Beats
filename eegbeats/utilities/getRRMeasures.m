@@ -28,7 +28,7 @@ function RRMeasures = getRRMeasures(peakFrames, blockMinutes, params)
     else
         RRMeasures.numBadRRs = 0;
     end
-    ts = frames/params.srate;
+    
     
     RRMeasures.numRRs = length(RRs);
     RRMeasures.meanRR = mean(RRs);
@@ -36,12 +36,7 @@ function RRMeasures = getRRMeasures(peakFrames, blockMinutes, params)
     RRMeasures.skewRR = skewness(RRs);
     RRMeasures.kurtosisRR = kurtosis(RRs);
     RRMeasures.iqrRR = iqr(RRs);
-    if (params.detrendOrder > 0)
-        dRRs = detrend(RRs, params.detrendOrder, 'SamplePoints', ts);
-        zdiff = RRs - dRRs;
-        RRMeasures.trendSlope = (zdiff(2) - zdiff(1))/ts(2) - ts(1);
-        RRs = dRRs;
-    end
+
     RRMeasures.SDNN = std(RRs);
     RRDiffs = abs(RRs(2:end) - RRs(1:end-1));
     RRMeasures.SDSD = std(RRDiffs);
@@ -49,8 +44,16 @@ function RRMeasures = getRRMeasures(peakFrames, blockMinutes, params)
     RRMeasures.NN50 = sum(RRDiffs > 50);
     RRMeasures.pNN50 = 100*RRMeasures.NN50/length(RRDiffs);
     
+    %% Should we remove the trend before doing spectral measures
+    ts = (frames - 1)/params.srate;
+    if (params.detrendOrder > 0)
+        dRRs = detrend(RRs, params.detrendOrder, 'SamplePoints', ts);
+        zdiff = RRs - dRRs;
+        RRMeasures.trendSlope = (zdiff(2) - zdiff(1))/ts(2) - ts(1);
+        RRs = dRRs;
+    end
+    
     %% Now compute frequency measures
-    ts = frames/params.srate;
     [pSpectrum, f] = getSpectrum(RRs, ts, params);
     RRMeasures.spectrumType = params.spectrumType;
     deltaF = f(2)-f(1);

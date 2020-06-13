@@ -12,10 +12,12 @@
 
 %% Set the paths
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
-peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\rrInfo.mat';
-figureDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images';
+% peakFile = 'D:\TestData\NCTU_RWN_VDE_Temp\ekgPeaks.mat';
+% infoFile = 'D:\TestData\NCTU_RWN_VDE_Temp\rrInfo.mat';
+figureDir = 'D:\TestData\NCTU_RWN_VDE_Temp_Images';
 
+peakFile = [];
+infoFile = [];
 %% Set the base parameters (an empty structure uses the defaults)
 baseParams = struct();
 baseParams.figureVisibility = 'on';
@@ -29,13 +31,17 @@ numFiles = length(EEGFiles);
 if ~isempty(figureDir) && ~exist(figureDir, 'dir')
     mkdir(figureDir);
 end
-ekgDir = fileparts(peakFile);
-if ~isempty(ekgDir) && ~exist(ekgDir, 'dir')
-    mkdir(ekgDir);
+if ~isempty(peakFile)
+    ekgDir = fileparts(peakFile);
+    if ~isempty(ekgDir) && ~exist(ekgDir, 'dir')
+        mkdir(ekgDir);
+    end
 end
-infoDir = fileparts(infoFile);
-if ~isempty(infoDir) && ~exist(infoDir, 'dir')
-    mkdir(infoDir);
+if ~isempty(infoFile)
+    infoDir = fileparts(infoFile);
+    if ~isempty(infoDir) && ~exist(infoDir, 'dir')
+        mkdir(infoDir);
+    end
 end
 
 %% Set up the structure for saving the peak and ekg information
@@ -43,7 +49,7 @@ end
 ekgPeaks(numFiles) = ekgPeaks(1);
 RRInfo(numFiles) = RRInfo(1);
 %% Get the indicators
-for k = 1:numFiles
+for k = 1%:numFiles
     EEG = pop_loadset(EEGFiles{k});
     
     %% Split out the subdirectories to create names

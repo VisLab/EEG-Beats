@@ -95,21 +95,26 @@ function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
     end
     
     %% Save the figure if required
-    if isempty(hFig1) 
-        return;
-    end
     if ~isempty(params.figureDir)
         if ~exist(params.figureDir, 'dir')
             mkdir(params.figureDir);
         end
-        saveas(hFig1, [params.figureDir filesep params.fileName '_ekgPeaks.fig'], 'fig');
-        saveas(hFig1, [params.figureDir filesep params.fileName '_ekgPeaks.png'], 'png');
-        saveas(hFig2, [params.figureDir filesep params.fileName '_rrVsPeaks.fig'], 'fig');
-        saveas(hFig2, [params.figureDir filesep params.fileName '_RRVsPeaks.png'], 'png');
+        
+        
+        if ~isempty(hFig1)
+            saveas(hFig1, [params.figureDir filesep params.fileName '_ekgPeaks.fig'], 'fig');
+            saveas(hFig1, [params.figureDir filesep params.fileName '_ekgPeaks.png'], 'png');
+        end
+        if ~isempty(hFig2)
+            saveas(hFig2, [params.figureDir filesep params.fileName '_rrVsPeaks.fig'], 'fig');
+            saveas(hFig2, [params.figureDir filesep params.fileName '_RRVsPeaks.png'], 'png');
+        end
     end
+    
+    %% Now handle figure closing if needed
     if strcmpi(params.figureVisibility, 'off') || params.figureClose
         close(hFig1)
         close(hFig2)
     end
-
+    
 end
