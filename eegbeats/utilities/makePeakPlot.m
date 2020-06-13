@@ -4,11 +4,7 @@ function hFig = makePeakPlot(ekgPeaks, baseTitle, params)
 %%  Create a figure
     hFig = figure('Name', baseTitle, 'Visible', params.figureVisibility);
 
-    title({ekgPeaks.fileName; baseTitle}, 'Interpreter', 'None')
-    xlabel('Seconds')
-    ylabel('EKG signal')
-    box on
-    
+ 
 %% See if there is ekg to plot    
     ekg = ekgPeaks.ekg;
     peakFrames = ekgPeaks.peakFrames;
@@ -39,6 +35,10 @@ function hFig = makePeakPlot(ekgPeaks, baseTitle, params)
     line([0, max(seconds)], [peakPrts(2), peakPrts(2)], 'LineWidth', 1, 'LineStyle', '-', 'Color', [0, 0.8, 0]);
     line([0, max(seconds)], [peakPrts(3), peakPrts(3)], 'LineWidth', 1, 'LineStyle', '-', 'Color', [0.7, 0.7, 0.7]);
     set(hFig, 'position', [0 0 2000 500])
-
+    title({ekgPeaks.fileName; baseTitle}, 'Interpreter', 'None')
+    xlabel('Seconds')
+    ylabel('EKG signal')
+    box on
+    
     hold off
 
