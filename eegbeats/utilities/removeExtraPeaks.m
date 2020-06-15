@@ -1,18 +1,20 @@
-function [peakFramesNew, lowAmplitudePeaks] = ...
-    removeExtraPeaks(ekg, peakFrames, maxRRFrames, minPeakAmpRatio)
+function [peakFramesNew, lowAmplitudePeaks, highAmplitudePeaks] = ...
+                            removeExtraPeaks(ekg, peakFrames, params)
 %% Remove the small extra peaks in each method (assumes oriented upward)
     if isempty(peakFrames) || (isscalar(peakFrames) && isnan(peakFrames))
         peakFramesNew = [];
         lowAmplitudePeaks = [];
+        highAmplitudePeaks = [];
         return;
     end
+    maxRRFrames = round(params.rrMaxMs.*params.srate./1000);
     rrs = peakFrames(2:end) - peakFrames(1:end-1);
     rrs(rrs > maxRRFrames) = [];
     rrMedian = median(rrs);
     peakMask = false(size(peakFrames));
     ekgM = ekg - median(ekg);
-    ekgPcts = prctile(abs(ekgM(peakFrames)), [25, 75]);
-    rrsPcts = prctile(rrs, [25, 75]);
+    ekgPcts = prctile(abs(ekgM(peakFrames)), [25, 50, 75]);
+    rrsPcts = prctile(rrs, [25, 50, 75]);
     for k = 2:length(peakFrames) - 1
         d3 = peakFrames(k + 1) - peakFrames(k - 1);
         % Is RR interval large or is peak k bigger than its neighbors
@@ -29,18 +31,25 @@ function [peakFramesNew, lowAmplitudePeaks] = ...
     end
     peakFramesNew = peakFrames(~peakMask);
     
-    %% Now handle peaks at the beginning and end of the record
-    rrsOutlier = rrsPcts(1) - 1.5*(rrsPcts(2) - rrsPcts(1));
-    peakOutlier = ekgPcts(1) - 1.5*(ekgPcts(2) - ekgPcts(1));
-    if rrs(1) < rrsOutlier && abs(ekgM(peakFramesNew(1))) < peakOutlier
+    %% Small peaks at the beginning and end of the record are problematic
+    rrsLowOutlier = rrsPcts(1) - params.maxWhisker*(rrsPcts(3) - rrsPcts(1));
+    peakLowOutlier = ekgPcts(1) - params.maxWhisker*(ekgPcts(3) - ekgPcts(1));
+    if rrs(1) < rrsLowOutlier && abs(ekgM(peakFramesNew(1))) < peakLowOutlier
        peakFramesNew(1) = [];
     end
-    if rrs(end) < rrsOutlier && abs(ekgM(peakFramesNew(end))) < peakOutlier
+    if rrs(end) < rrsLowOutlier && abs(ekgM(peakFramesNew(end))) < peakLowOutlier
        peakFramesNew(end) = [];
     end
     
-    %% Now mask again for remaining very small amplitudes
-    lowMask = abs(ekgM(peakFramesNew)) < peakOutlier & ...
-              abs(ekgM(peakFramesNew)) < minPeakAmpRatio*abs(ekgPcts(2));
+    %% Mask again for remaining very small amplitudes
+    medPeaks = median(ekg(peakFrames));  % Median of peaks in original
+    lowMask = abs(ekgM(peakFramesNew)) < peakLowOutlier & ...
+              abs(ekgM(peakFramesNew)) < params.minPeakAmpRatio*abs(medPeaks);
     lowAmplitudePeaks = peakFramesNew(lowMask);
  
+    %% Mask for very high amplitudes
+    peakHighOutlier = ekgPcts(3) + params.maxWhisker*(ekgPcts(3) - ekgPcts(1));
+
+    highMask = abs(ekgM(peakFramesNew)) > peakHighOutlier & ...
+              abs(ekgM(peakFramesNew)) > params.maxPeakAmpRatio*medPeaks;
+    highAmplitudePeaks = peakFramesNew(highMask);

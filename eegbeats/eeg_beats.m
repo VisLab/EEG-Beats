@@ -53,11 +53,9 @@ function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
      end
     
     %% Remove extra peaks in each representation individually
-    maxRRFrames = round(params.rrMaxMs.*params.srate./1000);
-    peakFramesReduced = removeExtraPeaks(ekg, peakFrames, maxRRFrames, ...
-         params.minPeakAmpRatio);
-    peakSingleFramesReduced = removeExtraPeaks(ekg, peakSingleFrames, ...
-        maxRRFrames, params.minPeakAmpRatio);
+    
+    peakFramesReduced = removeExtraPeaks(ekg, peakFrames, params);
+    peakSingleFramesReduced = removeExtraPeaks(ekg, peakSingleFrames, params);
     if params.verbose
         fprintf('----after removal: peak-trough:%d, two-sided:%d, intersect:%d\n', ...
             length(peakFramesReduced), length(peakSingleFramesReduced), ...
@@ -65,9 +63,10 @@ function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
     end  
     
     %% Combine the peaks from the two methods and consider low amp peaks
-    [peaksCombined, peaksRest] = combineMethodPeaks(peakFramesReduced, peakSingleFramesReduced, minRRFrames);
-    [peaksCombinedFinal, lowAmplitudePeaks] = removeExtraPeaks(ekg, ...
-        peaksCombined, maxRRFrames,  params.minPeakAmpRatio);
+    [peaksCombined, peaksRest] = combineMethodPeaks(peakFramesReduced, ...
+                                     peakSingleFramesReduced, minRRFrames);
+    [peaksCombinedFinal, lowAmplitudePeaks, highAmplitudePeaks] = ...
+        removeExtraPeaks(ekg, peaksCombined, params);
     if params.verbose
         fprintf('----after combination: peaks:%d, peaks left:%d\n', ...
             length(peaksCombined), length(peaksRest));
@@ -81,7 +80,10 @@ function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
     if ~isempty(peaksCombinedFinal)
         ekgPeaks.peakFrames = peaksCombinedFinal;
         ekgPeaks.lowAmplitudePeaks = lowAmplitudePeaks;
+        ekgPeaks.highAmplitudePeaks = highAmplitudePeaks;
+
     end
+    
     %% Plot the data if requested
     if params.doPlot 
         baseString = sprintf(['peak-trough:%d, single:%d, ' ...

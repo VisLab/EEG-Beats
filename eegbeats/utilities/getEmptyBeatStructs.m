@@ -1,7 +1,7 @@
 function [ekgPeaks, rrInfo, rrMeasures] = getEmptyBeatStructs()
 
 ekgPeaks = struct('fileName', NaN, 'srate', NaN, 'ekg', NaN, ...
-    'peakFrames', NaN, 'lowAmplitudePeaks', NaN);
+    'peakFrames', NaN, 'lowAmplitudePeaks', NaN, 'highAmplitudePeaks', NaN);
               
 rrInfo = struct('fileName', NaN, 'fileMinutes', NaN, 'overallValues', NaN, ...
                  'blockMinutes', NaN, 'blockStepMinutes', NaN, 'blockValues', NaN);

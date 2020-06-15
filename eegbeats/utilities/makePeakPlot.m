@@ -13,22 +13,44 @@ function hFig = makePeakPlot(ekgPeaks, baseTitle, params)
        return;
    end
     
+
+    %% See if there are peaks to plot 
+    if isempty(peakFrames) || (isscalar(peakFrames) && isnan(peakFrames))
+        warning('%s: does not have any heart beats', params.fileName);
+        peakPrts = [];
+    else
+        peakPrts = prctile(ekg(peakFrames), [25, 50, 75]);
+        if ~isinf(params.figureClip)
+            basePoint = max(abs(peakPrts));
+            extremeLim = basePoint + params.figureClip*abs(peakPrts(3) - peakPrts(1));
+            extremeLim = max(extremeLim, 2*basePoint);
+            ekg(ekg < -extremeLim) = -extremeLim;
+            ekg(ekg > extremeLim) = extremeLim;
+        end
+    end
+    
     %% We have ekg, so plot it
     seconds = (0:(length(ekg) - 1))./params.srate;
     plot(seconds, ekg);
     
-    %% See if there are peaks to plot 
-    if isempty(peakFrames) || (isscalar(peakFrames) && isnan(peakFrames))
-       warning('%s: does not have any heart beats', params.fileName);
-       return;
+    %% If no peak frames, stop here
+    if isempty(peakPrts)
+        return;
     end
+
+    %% Plot the peaks
     lowPeaks = ekgPeaks.lowAmplitudePeaks;
-    peakPrts = prctile(ekg(peakFrames), [25, 50, 75]);
+    highPeaks = ekgPeaks.highAmplitudePeaks;
     hold on;
     plot(seconds(peakFrames), ekg(peakFrames), 'r*', 'MarkerSize', 10);
     if ~isempty(lowPeaks) || ~isscalar(lowPeaks) || ...
        (isscalar(lowPeaks) && ~isnan(lowPeaks))
         plot(seconds(lowPeaks), ekg(lowPeaks), 'xk', ...
+            'MarkerSize', 12, 'LineWidth', 2)
+    end
+    if ~isempty(highPeaks) || ~isscalar(highPeaks) || ...
+       (isscalar(highPeaks) && ~isnan(highPeaks))
+        plot(seconds(highPeaks), ekg(highPeaks), '+k', ...
             'MarkerSize', 12, 'LineWidth', 2)
     end
     line([0, max(seconds)], [peakPrts(1), peakPrts(1)], 'LineWidth', 1, 'LineStyle', '-', 'Color', [0.7, 0.7, 0.7]);
@@ -41,4 +63,3 @@ function hFig = makePeakPlot(ekgPeaks, baseTitle, params)
     box on
     
     hold off
-

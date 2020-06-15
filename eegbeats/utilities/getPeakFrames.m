@@ -16,8 +16,6 @@ peakFrames = []; sigRight = -1;
 qrsHalfFrames = round(0.5*params.qrsDurationMs*params.srate./1000);
 ekg = ekg - median(ekg);
 ekgAll = ekg;
-ekgFlip = fliplr(ekgAll);
-ekgFlip = -ekgFlip;
 
 %% First truncate signal so extreme peaks don't affect the result.
 % lowerMax = getAvgMin(ekg) - (params.stdTruncate*1.4826*mad(ekg,1));
@@ -35,7 +33,10 @@ threshold = params.threshold*1.4826*mad(ekg,1);
 flip = getFlipDirection(ekg, flipIntervalFrames, threshold);
 if flip == -1
     return;
-elseif flip > 0
+elseif params.forceFlip
+    flip = 1;
+end
+if flip > 0
     ekg = -ekg;
 end
 

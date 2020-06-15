@@ -40,17 +40,15 @@ function hFig = makePeakDistributionPlot(ekgPeaks, baseTitle, params)
   
     set(gca, 'YLim', [params.rrMinMs, params.rrMaxMs]);
     xLims = get(gca, 'XLim');
-    lowLim = max(xLims(1),  peakPrts(1) - 3*(peakPrts(3) - peakPrts(1)));
-    highLim = min(xLims(2), peakPrts(3) + 3*(peakPrts(3) - peakPrts(1)));
-    
-    %% Now plot clipped outliers
-    plotMasked(ekg(peaksLeft) < lowLim, lowLim, leftColor, leftMarker)
-    plotMasked(ekg(peaksRight) < lowLim, lowLim, rightColor, rightMarker)
-    plotMasked(ekg(peaksLeft) > highLim, highLim, leftColor, leftMarker)
-    plotMasked(ekg(peaksRight) > highLim, highLim, rightColor, rightMarker)
-
-    %% Reset the axis
-    set(gca, 'XLim', [lowLim, highLim]);
+    if ~isinf(params.figureClip)
+        lowLim = max(xLims(1),  peakPrts(1) - params.figureClip*(peakPrts(3) - peakPrts(1)));
+        highLim = min(xLims(2), peakPrts(3) + params.figureClip*(peakPrts(3) - peakPrts(1)));
+        plotMasked(ekg(peaksLeft) < lowLim, lowLim, leftColor, leftMarker)
+        plotMasked(ekg(peaksRight) < lowLim, lowLim, rightColor, rightMarker)
+        plotMasked(ekg(peaksLeft) > highLim, highLim, leftColor, leftMarker)
+        plotMasked(ekg(peaksRight) > highLim, highLim, rightColor, rightMarker)
+        set(gca, 'XLim', [lowLim, highLim]);
+    end
     axis square
     yLims = get(gca, 'YLim');
     xLims = get(gca, 'XLim');

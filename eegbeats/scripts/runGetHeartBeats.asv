@@ -19,7 +19,6 @@ figureDir = 'D:\TestData\NCTU_RWN_VDE_Heart_Images1';
 baseParams = struct();
 baseParams.figureVisibility = 'on';
 baseParams.figureDir = figureDir;
-baseParams.figureClose = true;
 
 %% Get a list of all of the .set files in the directory tree of rawDir
 EEGFiles = getFileAndFolderList(rawDir, {'*.set'}, true);
