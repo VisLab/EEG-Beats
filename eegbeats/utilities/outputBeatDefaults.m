@@ -15,9 +15,8 @@ numFields = length(fNames);
 fprintf(fd, 'eegbeat defaults:\n');
 for k = 1:numFields
     dValue = defaults.(fNames{k});
-    fprintf(fd, '\t%s: [%s] %s', fNames{k}, num2str(dValue.value), ...
-        dValue.description);
-    
+    fprintf(fd, '\t%s: [%s]\n', fNames{k}, num2str(dValue.value));
+    fprintf(fd, '\t\t%s', dValue.description);
     if ~isempty(dValue.classes)
         fprintf(fd, '\n\t\t[classes: ');
         for m = 1:length(dValue.classes)

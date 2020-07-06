@@ -1,5 +1,5 @@
-% function [matched, unMatchedFirst, unMatchedSecond] = ...
-%                        matchPeaks(peakFrames1, peakFrames2, frameLimit)
+function [matched, unMatchedFirst, unMatchedSecond] = ...
+                        matchPeaks(peakFrames1, peakFrames2, frameLimit)
   
     dMat = pdist2(peakFrames1(:), peakFrames2(:));
     

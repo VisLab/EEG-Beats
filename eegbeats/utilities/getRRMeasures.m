@@ -1,21 +1,21 @@
-function RRMeasures = getRRMeasures(peakFrames, blockMinutes, params)
-%% Given a specific ibi generate the indicators
+function rrMeasures = getRRMeasures(peakFrames, blockMinutes, params)
+%% Given a specific list of peak frames generate RR measures
 % Parameters:
-%       the ibi signal
-% Return value:
-%       the different statistical indicators as a list of size 6
-%       containing the following in order:
-%           mean std rmssd nn50
-%           pnn50 rrt
+%    peakFrames     array of frame (sample) numbers for peak locations
+%    blockMinutes   total length in minutes of data represented peakFrames
+%    params         parameter structure
+%    rrMeasures     (output) an rrMeasures structure
+%
+% Notes:  See getEmptyBeatStructs for form of rrMeasures.
 %%
-    [~, ~, RRMeasures] = getEmptyBeatStructs();
+    [~, ~, rrMeasures] = getEmptyBeatStructs();
     if isempty(peakFrames)
         warning('Failed because no peak frames');
         return;
     end
-    RRMeasures.startMinutes = 0;
-    RRMeasures.blockMinutes = blockMinutes;
-    RRMeasures.meanHR = length(peakFrames)./blockMinutes;
+    rrMeasures.startMinutes = 0;
+    rrMeasures.blockMinutes = blockMinutes;
+    rrMeasures.meanHR = length(peakFrames)./blockMinutes;
     RRs = 1000*(peakFrames(2:end) - peakFrames(1:end-1))/params.srate;
     frames = peakFrames(2:end);
     
@@ -24,52 +24,52 @@ function RRMeasures = getRRMeasures(peakFrames, blockMinutes, params)
         badRRMask = RRs < params.rrMinMs | RRs > params.rrMaxMs;
         RRs = RRs(~badRRMask);
         frames = frames(~badRRMask);
-        RRMeasures.numBadRRs = sum(badRRMask);
+        rrMeasures.numBadRRs = sum(badRRMask);
     else
-        RRMeasures.numBadRRs = 0;
+        rrMeasures.numBadRRs = 0;
     end
     
     
-    RRMeasures.numRRs = length(RRs);
-    RRMeasures.meanRR = mean(RRs);
-    RRMeasures.medianRR = median(RRs);
-    RRMeasures.skewRR = skewness(RRs);
-    RRMeasures.kurtosisRR = kurtosis(RRs);
-    RRMeasures.iqrRR = iqr(RRs);
+    rrMeasures.numRRs = length(RRs);
+    rrMeasures.meanRR = mean(RRs);
+    rrMeasures.medianRR = median(RRs);
+    rrMeasures.skewRR = skewness(RRs);
+    rrMeasures.kurtosisRR = kurtosis(RRs);
+    rrMeasures.iqrRR = iqr(RRs);
 
-    RRMeasures.SDNN = std(RRs);
+    rrMeasures.SDNN = std(RRs);
     RRDiffs = abs(RRs(2:end) - RRs(1:end-1));
-    RRMeasures.SDSD = std(RRDiffs);
-    RRMeasures.RMSSD = sqrt(mean(RRDiffs.*RRDiffs));
-    RRMeasures.NN50 = sum(RRDiffs > 50);
-    RRMeasures.pNN50 = 100*RRMeasures.NN50/length(RRDiffs);
+    rrMeasures.SDSD = std(RRDiffs);
+    rrMeasures.RMSSD = sqrt(mean(RRDiffs.*RRDiffs));
+    rrMeasures.NN50 = sum(RRDiffs > 50);
+    rrMeasures.pNN50 = rrMeasures.NN50/length(RRDiffs);
     
     %% Should we remove the trend before doing spectral measures
     ts = (frames - 1)/params.srate;
     if (params.detrendOrder > 0)
         dRRs = detrend(RRs, params.detrendOrder, 'SamplePoints', ts);
         zdiff = RRs - dRRs;
-        RRMeasures.trendSlope = (zdiff(2) - zdiff(1))/ts(2) - ts(1);
+        rrMeasures.trendSlope = (zdiff(2) - zdiff(1))/ts(2) - ts(1);
         RRs = dRRs;
     end
     
     %% Now compute frequency measures
     [pSpectrum, f] = getSpectrum(RRs, ts, params);
-    RRMeasures.spectrumType = params.spectrumType;
+    rrMeasures.spectrumType = params.spectrumType;
     deltaF = f(2)-f(1);
-    RRMeasures.totalPower = 0.5*(2*sum(pSpectrum) - pSpectrum(1) - pSpectrum(end))*deltaF;
+    rrMeasures.totalPower = 0.5*(2*sum(pSpectrum) - pSpectrum(1) - pSpectrum(end))*deltaF;
 
     VLF = pSpectrum(params.VLFRange(1) < f & f <= params.VLFRange(2));
     LF = pSpectrum(params.LFRange(1) < f & f <= params.LFRange(2));
     HF = pSpectrum(params.HFRange(1) < f & f <= params.HFRange(2));
-    RRMeasures.VLF = 0.5*(2*sum(VLF) - VLF(1) - VLF(end))*deltaF;
-    RRMeasures.LF = 0.5*(2*sum(LF) - LF(1) - LF(end))*deltaF;
-    RRMeasures.LFnu = 100*RRMeasures.LF/(RRMeasures.totalPower - RRMeasures.VLF);
-    RRMeasures.HF = 0.5*(2*sum(HF) - HF(1) - HF(end))*deltaF;
+    rrMeasures.VLF = 0.5*(2*sum(VLF) - VLF(1) - VLF(end))*deltaF;
+    rrMeasures.LF = 0.5*(2*sum(LF) - LF(1) - LF(end))*deltaF;
+    rrMeasures.LFnu = 100*rrMeasures.LF/(rrMeasures.totalPower - rrMeasures.VLF);
+    rrMeasures.HF = 0.5*(2*sum(HF) - HF(1) - HF(end))*deltaF;
 
-    RRMeasures.HFnu = 100*RRMeasures.HF/(RRMeasures.totalPower - RRMeasures.VLF);
-    RRMeasures.LFHFRatio = RRMeasures.LF/RRMeasures.HF;
-    RRMeasures.PSD = pSpectrum;
-    RRMeasures.F = f;
+    rrMeasures.HFnu = 100*rrMeasures.HF/(rrMeasures.totalPower - rrMeasures.VLF);
+    rrMeasures.LFHFRatio = rrMeasures.LF/rrMeasures.HF;
+    rrMeasures.PSD = pSpectrum;
+    rrMeasures.F = f;
 
 end

@@ -1,29 +1,26 @@
-%% Display box plots of the distributions of the indicators by variable
-
+%% Run anova analysis on a single variable
 
 %% Set the file names
 peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\ekgPeaks.mat';
 infoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\rrInfo.mat';
 metaFile = 'D:\TestData\NCTU_RWN_VDE_Heart\meta.mat';
-plotDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Analysis\boxplots';
+analysisDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Analysis\anova1';
 
 %% Set the parameters
-%metaVariables = {'subject', 'group', 'task'};
-metaVariables = {'subject'};
-% rrMeasures = {'meanHR', 'meanRR', 'medianRR', 'SDNN', 'SDSD', 'RMSSD', ...
-%               'NN50', 'pNN50', 'totalPower', 'VLF', 'LF', 'LFnu', 'LFHFRatio'};
-rrMeasures = {'LFnu'};
-%rrMeasureTypes = {'overallValues', 'blockValues'};
-rrMeasureTypes = {'blockValues'};
+metaVariables = {'subject', 'group', 'task'};
+rrMeasures = {'meanHR', 'meanRR', 'medianRR', 'SDNN', 'SDSD', 'RMSSD', ...
+              'NN50', 'pNN50', 'totalPower', 'VLF', 'LF', 'LFnu', ...
+              'HF', 'HFnu', 'LFHFRatio'};
+rrMeasureTypes = {'overallValues', 'blockValues'};
 rrScalingTypes = {'None', 'Subtract', 'Divide'};
 scalingTask = 'Pre_EXP_resting';
-figFormats = {'.png', 'png'; '.fig', 'fig'; '.pdf' 'pdf'; '.eps', 'epsc'};
-%figFormats = {'.png', 'png'};
-%figClose = true;
-figClose = false;
+%figFormats = {'.png', 'png'; '.fig', 'fig'; '.pdf' 'pdf'; '.eps', 'epsc'};
+figFormats = {'.png', 'png'};
+figClose = true;
+
 %% Make sure that the plot directory exists
-if ~isempty(plotDir) && ~exist(plotDir, 'dir')
-    mkdir(plotDir)
+if ~isempty(analysisDir) && ~exist(analysisDir, 'dir')
+    mkdir(analysisDir)
 end
 
 %% Load the info file
@@ -70,6 +67,10 @@ metadata = metadata(metaIndex);
 rrInfo(metaIndex == 0) = [];
 
 %% Plot the box plots
+anova1Info = struct('metaVariables', NaN, 'rrMeasures', NaN, 'scaling', NaN, ...
+                    'measureType', NaN, 'pValues', NaN, 'fValues', NaN, 'df', NaN);
+anova1Info(length(rrMeasureTypes)*length(rrScalingTypes)) = anova1Info(1);
+count = 0;
 for k = 1:length(rrMeasureTypes)
     [rrValues, rrPositions] = ...
         consolidateRRMeasures(rrInfo, rrMeasureTypes{k}, rrMeasures);
@@ -109,6 +110,10 @@ for k = 1:length(rrMeasureTypes)
             scalingString = ['Scaled by dividing ' scalingTask];
             scalingLine = 1;
         end
+        
+        pValues = nan(length(rrMeasures), length(metaVariables));
+        fValues = nan(length(rrMeasures), length(metaVariables));
+        df = nan(length(rrMeasures), length(metaVariables));
         for g = 1:length(metaVariables)
             if ~isfield(metadata, metaVariables{g})
                 warning('%s is not a field of metadata...skipping', metaVariables{g});
@@ -117,23 +122,33 @@ for k = 1:length(rrMeasureTypes)
             thisMeta = {metadata.(metaVariables{g})};
             groups = thisMeta(rrPositions);
             groups = groups(taskMask);
+            
+         
             for m = 1:length(rrMeasures)
                 theseValues = rrScaledValues(:, m);
-                valueMask = ~isnan(theseValues);
+                valueMask = ~isnan(theseValues) & ~isinf(theseValues);
                 theseValues = theseValues(valueMask);
                 theseGroups = groups(valueMask);
-                fprintf('%s: %s has %d nans\n', metaVariables{g}, rrMeasures{m}, sum(~valueMask));
-                
-                %% Now plot the box plot
-                baseTitle = {[rrMeasures{m} ' ' rrMeasureTypes{k} ' grouped by '  ...
-                      metaVariables{g}]; scalingString};
-                hFig = makeFactorBoxplot(theseValues, theseGroups, ...
-                                rrMeasures{m}, metaVariables{g}, baseTitle, scalingLine);
-                saveName = [rrMeasures{m} '_groupedBy_' metaVariables{g} '_' ...
-                    rrMeasureTypes{k} '_Scaling_' rrScalingTypes{s}];
-                saveFigures(hFig, [plotDir filesep saveName], figFormats, figClose);
+                [pValues(m, g), theTable] = anova1(theseValues(:), theseGroups(:), 'off');  
+                fValues(m, g) = theTable{2, 5};
+                df(m, g) = theTable{2, 3};
+                if isnan(pValues(m, g))
+                    pause;
+                end
             end
+      
         end
+        count = count + 1;
+        anova1Info(count) = anova1Info(end);
+        anova1Info(count).metaVariables = metaVariables;
+        anova1Info(count).rrMeasures = rrMeasures;
+        anova1Info(count).scaling = rrScalingTypes{s};
+        anova1Info(count).measureType = rrMeasureTypes{k};
+        anova1Info(count).pValues = pValues;
+        anova1Info(count).fValues = fValues;
+        anova1Info(count).df = df;     
     end
 end
 
+%% Save the measures
+save([analysisDir filesep 'anova1Measures.mat'], 'anova1Info', '-v7.3');

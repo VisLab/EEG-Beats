@@ -1,9 +1,9 @@
 %% Script to calculate IBI measures from an existing peaks summary
 
 %% Set the files
-ekgFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data1\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data1\rrInfo.mat';
-
+ekgFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\ekgPeaks.mat';
+%infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\rrInfoBadRemoved.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\rrInfo.mat';
 %% Set up the structure templates
 [~, rrInfo, rrMeasures] = getEmptyBeatStructs();
 
@@ -12,6 +12,7 @@ temp = load(ekgFile);
 ekgPeaks = temp.ekgPeaks;
 params = temp.params;
 numFiles = length(ekgPeaks);
+params.removeOutOfRangePeaks = false;
 
 %% Initialize the structure
 rrInfo(numFiles) = rrInfo(1);

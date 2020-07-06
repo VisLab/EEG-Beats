@@ -1,11 +1,11 @@
 %% Produce a table of counts
 
-anovaFile = 'D:\TestData\NCTU_RWN_VDE_IBI_Analysis\anova\anova2BySubjectMeasures.mat';
+anovaFile = 'D:\TestData\NCTU_RWN_Heart_Analysis\anova\anova2Measures.mat';
 
 rrScalingTypes = {'None', 'Subtract', 'Divide'};
 %%
 temp = load(anovaFile);
-anova2Info = temp.anova2InfoBySubject;
+anova2Info = temp.anova2Info;
 
 %% 
 sig = 0.05;
