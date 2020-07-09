@@ -48,7 +48,7 @@ ekgPeaks = getEmptyBeatStructs();
 ekgPeaks(numFiles) = ekgPeaks(1);
 
 %% Get the indicators
-for n = 34%:numFiles
+for n = 10%:numFiles
     nKey = num2str(n);
     if ~isKey(sessionMap, nKey)
         warning('Session %s does not have file', nKey);

@@ -1,47 +1,61 @@
-function rrMeasures = getRRMeasures(RRs, blockMinutes, params)
-%% Given a specific list of RR
+function rrMeasures = getRRMeasures(peakFrames, blockMinutes, params)
+%% Given a specific list of peak frames generate RR measures
 % Parameters:
-%    RRs            nn x 2 array with positions in frames and values of RRs
+%    peakFrames     array of frame (sample) numbers for peak locations
 %    blockMinutes   total length in minutes of data represented peakFrames
 %    params         parameter structure
 %    rrMeasures     (output) an rrMeasures structure
 %
 % Notes:  See getEmptyBeatStructs for form of rrMeasures.
 %%
-
     [~, ~, rrMeasures] = getEmptyBeatStructs();
-    if size(RRs, 1) < 2
-        warning('Must have at least 2 RR values to compute measures');
+    if isempty(peakFrames)
+        warning('Failed because no peak frames');
         return;
     end
     rrMeasures.startMinutes = 0;
-    rrMeasures.totalRRs = size(RRs, 1);
-    rrMeasures.meanHR = (rrMeasures.totalRRs + 1)./blockMinutes;
-    ts = (RRs(:, 1) - 1)/params.srate;
-    rrMeasures.numRRs = size(RRs, 1);
-    rrMeasures.meanRR = mean(RRs(:, 2));
-    rrMeasures.medianRR = median(RRs(:, 2));
-    rrMeasures.skewRR = skewness(RRs(:, 2));
-    rrMeasures.kurtosisRR = kurtosis(RRs(:, 2));
-    rrMeasures.iqrRR = iqr(RRs(:, 2));
+    rrMeasures.blockMinutes = blockMinutes;
+    rrMeasures.meanHR = length(peakFrames)./blockMinutes;
+    [allRRs, masks] = getRRsFromPeaks(peakFrames, lowAmpPeaks, highAmpPeaks, params)
+    RRs = 1000*(peakFrames(2:end) - peakFrames(1:end-1))/params.srate;
+    frames = peakFrames(2:end);
+    
+    %% See if we should remove out of range RRs
+    if params.removeOutOfRangeRRs
+        badRRMask = RRs < params.rrMinMs | RRs > params.rrMaxMs;
+        RRs = RRs(~badRRMask);
+        frames = frames(~badRRMask);
+        rrMeasures.numBadRRs = sum(badRRMask);
+    else
+        rrMeasures.numBadRRs = 0;
+    end
+    
+    
+    rrMeasures.numRRs = length(RRs);
+    rrMeasures.meanRR = mean(RRs);
+    rrMeasures.medianRR = median(RRs);
+    rrMeasures.skewRR = skewness(RRs);
+    rrMeasures.kurtosisRR = kurtosis(RRs);
+    rrMeasures.iqrRR = iqr(RRs);
 
-    rrMeasures.SDNN = std(RRs(:, 2));
-    RRDiffs = abs(RRs(2:end, 2) - RRs(1:end-1, 2));
+    rrMeasures.SDNN = std(RRs);
+    RRDiffs = abs(RRs(2:end) - RRs(1:end-1));
     rrMeasures.SDSD = std(RRDiffs);
     rrMeasures.RMSSD = sqrt(mean(RRDiffs.*RRDiffs));
     rrMeasures.NN50 = sum(RRDiffs > 50);
     rrMeasures.pNN50 = rrMeasures.NN50/length(RRDiffs);
     
     %% Should we remove the trend before doing spectral measures
-    dRRs = RRs(:, 2);
+    ts = (frames - 1)/params.srate;
     if (params.detrendOrder > 0)
-        dRRs = detrend(RRs(:, 2), params.detrendOrder, 'SamplePoints', ts);
-        zdiff = RRs(:, 2) - dRRs;
+        dRRs = detrend(RRs, params.detrendOrder, 'SamplePoints', ts);
+        zdiff = RRs - dRRs;
         rrMeasures.trendSlope = (zdiff(2) - zdiff(1))/ts(2) - ts(1);
+        RRs = dRRs;
     end
     
     %% Now compute frequency measures
-    [pSpectrum, f] = getSpectrum(dRRs, ts, params);
+    [pSpectrum, f] = getSpectrum(RRs, ts, params);
     rrMeasures.spectrumType = params.spectrumType;
     deltaF = f(2)-f(1);
     rrMeasures.totalPower = 0.5*(2*sum(pSpectrum) - pSpectrum(1) - pSpectrum(end))*deltaF;
@@ -58,4 +72,5 @@ function rrMeasures = getRRMeasures(RRs, blockMinutes, params)
     rrMeasures.LFHFRatio = rrMeasures.LF/rrMeasures.HF;
     rrMeasures.PSD = pSpectrum;
     rrMeasures.F = f;
+
 end

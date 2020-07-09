@@ -1,10 +1,11 @@
-function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
+function [ekgPeaks, params, hFig1, hFig2, hFig3, hFig4] = eeg_beats(EEG, params)
 
     %% Set up the return values
     ekgPeaks = getEmptyBeatStructs();
     hFig1 = [];
     hFig2 = [];
-    
+    hFig3 = [];
+    hFig4 = [];
     params = checkBeatDefaults(params, params, getBeatDefaults());
   
     if isfield(params, 'fileName')
@@ -94,6 +95,8 @@ function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
             length(peaksRest), flip, sigRight);
         hFig1 = makePeakPlot(ekgPeaks, baseString, params);
         hFig2 = makePeakDistributionPlot(ekgPeaks, baseString, params);
+        hFig3 = makeRROverlayPlot(ekgPeaks, params);
+        hFig4 = makeRRSubplot(ekgPeaks, params);
     end
     
     %% Save the figure if required
@@ -101,15 +104,23 @@ function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
         if ~exist(params.figureDir, 'dir')
             mkdir(params.figureDir);
         end
-        
-        
+               
         if ~isempty(hFig1)
             saveas(hFig1, [params.figureDir filesep params.fileName '_ekgPeaks.fig'], 'fig');
             saveas(hFig1, [params.figureDir filesep params.fileName '_ekgPeaks.png'], 'png');
         end
         if ~isempty(hFig2)
             saveas(hFig2, [params.figureDir filesep params.fileName '_rrVsPeaks.fig'], 'fig');
-            saveas(hFig2, [params.figureDir filesep params.fileName '_RRVsPeaks.png'], 'png');
+            saveas(hFig2, [params.figureDir filesep params.fileName '_rrVsPeaks.png'], 'png');
+        end
+        
+        if ~isempty(hFig3)
+            saveas(hFig3, [params.figureDir filesep params.fileName '_rrOverlay.fig'], 'fig');
+            saveas(hFig3, [params.figureDir filesep params.fileName '_rrOverlay.png'], 'png');
+        end
+        if ~isempty(hFig4)
+            saveas(hFig4, [params.figureDir filesep params.fileName '_rrSubplot.fig'], 'fig');
+            saveas(hFig4, [params.figureDir filesep params.fileName '_rrSubplot.png'], 'png');
         end
     end
     
@@ -117,6 +128,8 @@ function [ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params)
     if strcmpi(params.figureVisibility, 'off') || params.figureClose
         close(hFig1)
         close(hFig2)
+        close(hFig3)
+        close(hFig4)
     end
     
 end
