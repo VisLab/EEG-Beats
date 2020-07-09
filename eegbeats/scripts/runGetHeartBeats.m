@@ -14,13 +14,12 @@
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';
 peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
 figureDir = 'D:\TestData\NCTU_RWN_VDE_Heart_Images2';
-figureDir = [];
-peakFile = [];
+
 %% Set the base parameters (an empty structure uses the defaults)
 baseParams = struct();
 baseParams.figureVisibility = 'on';
 baseParams.figureDir = figureDir;
-baseParams.figureClose = false;
+baseParams.figureClose = true;
 
 %% Get a list of all of the .set files in the directory tree of rawDir
 EEGFiles = getFileAndFolderList(rawDir, {'*.set'}, true);
@@ -42,7 +41,7 @@ ekgPeaks = getEmptyBeatStructs();
 ekgPeaks(numFiles) = ekgPeaks(1);
 
 %% Get the indicators
-for k = 10%:numFiles
+for k = 1:numFiles
     EEG = pop_loadset(EEGFiles{k});
     
     %% Split out the subdirectories to create names

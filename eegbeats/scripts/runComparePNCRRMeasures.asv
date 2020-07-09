@@ -1,13 +1,16 @@
-%% Script to compare EEG-Beat RR measures with previously computed PNC values
+%% Script to calculate RR measures from an existing peaks summary
 
-%% Set the file locations
-infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfo.mat';
-%infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval.mat';
+%% Set the files
+ekgFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
+%infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfo.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval.mat';
 pncFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\physionetInfo.mat';
-compareFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\EBPNCCompare.mat';
-%compareFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\EBPNCCompareWithRemoval.mat';
-
+%compareFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\EBPNCCompare.mat';
+compareFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\EBPNCCompareWithRemoval.mat';
 %% Load the heartbeat peaks
+temp = load(ekgFile);
+ekgPeaks = temp.ekgPeaks;
+params = temp.params;
 temp = load(infoFile);
 rrInfo = temp.rrInfo;
 temp = load(pncFile);
@@ -40,13 +43,10 @@ vlfPos = find(strcmpi(fields(:, 1), 'VLF'));
 
 %% Initialize the structure
 numFields = size(fields, 1);
-compareInfo = struct('EBName', NaN, 'PNCName', NaN, ...
-                     'numEBs', NaN, 'numPNCs', NaN, 'numBoth', NaN, ...
-                     'meanEB', NaN, 'meanPNC', NaN, ...
-                     'stdEB', NaN, 'stdPNC', NaN, 'madEBPNC', NaN, ...
-                     'EBValues', NaN, ...
-                     'PNCValues', NaN, 'EBMask', NaN, 'PNCMask', NaN);
-           
+compareInfo = struct('EBName', NaN, 'PNCName', NaN, 'EBValues', NaN, ...
+                     'PNCValues', NaN, 'EBMask', NaN, 'PNCMask', NaN, ...
+                     'numEBs', NaN, 'numPNCs', NaN, 'numBoth', NaN);
+                      
 compareInfo(numFields) = compareInfo(1);
 for k = 1:numFields
     compareInfo(k) = compareInfo(end);
@@ -68,7 +68,7 @@ compareInfo(lfnuPos).PNCValues = 100*compareInfo(lfPos).PNCValues./ ...
 compareInfo(lfnuPos).PNCMask = ~isnan(compareInfo(lfnuPos).PNCValues);
 
 %% Output the results
-fprintf('Measure        numEB numPNC numBoth  meanEB  meanPNC stdEB stdPNC  madDiff\n'), ...
+fprintf('Measure numEB numPNC numBoth  meanEB  meanPNC stdEB stdPNC  madDiff\n'), ...
 for k = 1:numFields
     EBMask = compareInfo(k).EBMask;
     PNCMask = compareInfo(k).PNCMask;
@@ -85,8 +85,8 @@ for k = 1:numFields
     compareInfo(k).meanPNC =  mean(PNCVals);
     compareInfo(k).stdEB = std(EBVals);
     compareInfo(k).stdPNC = std(PNCVals);
-    compareInfo(k).madEBPNC = madVals;
-    fprintf('%15s     %d \t%d \t%d \t%g \t%g \t%g \t%g \t%g\n', ...
+    compareInfo(k).madEBPNC = manVals;
+    fprintf('%s     %d   %d   %d   %g,  %g %g stdPNC:%g MAD:%g\n'], ...
         compareInfo(k).EBName, compareInfo(k).numEBs, ...
         compareInfo(k).numPNCs, compareInfo(k).numBoth, ...
         compareInfo(k).meanEB, compareInfo(k).meanPNC, ...

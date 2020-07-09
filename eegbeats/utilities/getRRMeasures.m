@@ -11,7 +11,7 @@ function rrMeasures = getRRMeasures(RRs, blockMinutes, params)
 
     [~, ~, rrMeasures] = getEmptyBeatStructs();
     if size(RRs, 1) < 2
-        warning('Must have at least 2 RR values to compute measures');
+        warning('%s: Must have at least 2 RR values to compute measures', params.fileName);
         return;
     end
     rrMeasures.startMinutes = 0;

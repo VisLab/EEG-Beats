@@ -102,12 +102,6 @@ for k = 1:length(rCompare)
     end
 end
 fprintf('Counts of frame distances to nearest from other.... \n');
-fprintf('Distances        nearest-PNC       nearest-EB\n');
-for m = 1:size(cLimits, 1)
-    fprintf('[%d, %d]:           %d                 %d\n', ...
-        cLimits(m, 1), cLimits(m, 2), counts(m, 1), counts(m, 2));
-end
-fprintf('\n');
-
+fprintf('
 %% Save the file
-save(compareFile, 'peakCompare', 'cLimits', 'counts', '-v7.3');
+save(compareFile, 'fields', 'compareInfo', '-v7.3');

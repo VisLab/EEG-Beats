@@ -2,8 +2,8 @@
 
 %% Set the files
 ekgFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
-%infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfo.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval.mat';
+%infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfo.mat';
 
 %% Set up the structure templates
 [~, rrInfo, rrMeasures] = getEmptyBeatStructs();
@@ -21,9 +21,13 @@ if ~isempty(errors)
    error(['Bad parameters: ' cell2str(errors)]);
 end
 params.rrBlockStepMinutes = 5.0;
-params.rrsAroundOutlierAmpPeaks = 0;
-params.rrOutlierNeighborhood = 0;
-params.removeOutOfRangeRRs = false;
+% params.rrsAroundOutlierAmpPeaks = 0;
+% params.rrOutlierNeighborhood = 0;
+% params.removeOutOfRangeRRs = false;
+
+params.rrsAroundOutlierAmpPeaks = 1;
+params.rrOutlierNeighborhood = 5;
+params.removeOutOfRangeRRs = true;
 
 %% Now step through each file and compute the indicators
 for k = 1:numFiles

@@ -40,7 +40,7 @@ end
 removeMask = outOfRangeRRMask;
 
 %% Should RRs around outlier peaks be removed?
-if params.RRsToRemoveAroundOutlierAmpPeaks > 0
+if params.rrsAroundOutlierAmpPeaks > 0
     outOfRangePeakRRMask = masks(:, strcmpi(maskTypes, 'LowAmpRR')) | ...
         masks(:, strcmpi(maskTypes, 'HighAmpRR'));
 else
@@ -49,7 +49,7 @@ end
 removeMask = removeMask | outOfRangePeakRRMask;
 
 %% Should RRs that don't agree with neighbors be removed?
-if params.RROutlierNeighborhood > 0
+if params.rrOutlierNeighborhood > 0
     neighborRRMask = masks(:, strcmpi(maskTypes, 'BadNeighborRR'));
 else
     neighborRRMask = false(size(allRRs, 1), 1);
