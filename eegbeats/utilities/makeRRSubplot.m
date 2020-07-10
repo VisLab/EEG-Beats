@@ -38,7 +38,7 @@ rrTimes = (allRRs(:, 1) - 1)./params.srate;
 
 %% Plot the EKG and peaks
 %[0 0.4470 0.7410] [0.8500 0.3250 0.0980]
-subplot(2, 1, 1)
+subplot(2, 1, 2)
 Lekg = plot(seconds, ekg, 'Color', [0.8, 0.8, 0.8], 'LineStyle', '-');
 hold on
 Lpeaks = plot(seconds(peakFrames), ekg(peakFrames), 'LineStyle', 'None', ...
@@ -51,7 +51,7 @@ Laxis = line(xLims, [0, 0], 'Color', [0.6500 0.5250 0.2980]);
 legendString = {'EEG', 'Peaks', 'EEG axis'};
 hold off
 
-subplot(2, 1, 2)
+subplot(2, 1, 1)
 hold on
 Lrrs = plot(rrTimes, allRRs(:, 2), 'sk', 'MarkerSize', 12, 'LineWidth', 1);
 legendString{end + 1} = 'RRs';
@@ -78,7 +78,7 @@ if sum(outOfRangePeakRRMask) > 0
 end
 
 set(gca, 'YLim', [500, 1500], 'YColor', [0, 0, 0]);
-set(hFig, 'position', [0 0 2000 500])
+set(hFig, 'position', [0 0 900 900])
 baseTitle = ['Peaks:' num2str(length(ekgPeaks)) ...
     ' Low peaks:' num2str(length(lowAmpPeaks)) ...
     ' High peaks:' num2str(length(highAmpPeaks)) ...
