@@ -2,10 +2,10 @@
 
 
 %% Set the file names
-peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\rrInfo.mat';
+peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval30SecStep.mat';
 metaFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Meta\meta.mat';
-plotDir = 'D:\TestData\NCTU_RWN_Heart_Analysis\boxplots';
+plotDir = 'D:\TestData\NCTU_RWN_Heart_Analysis_Data2\boxplots';
 
 %% Set the parameters
 %metaVariables = {'subject', 'group', 'task'};

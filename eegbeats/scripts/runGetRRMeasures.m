@@ -2,7 +2,7 @@
 
 %% Set the files
 ekgFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval30SecStep.mat';
 %infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfo.mat';
 
 %% Set up the structure templates
@@ -20,7 +20,7 @@ rrInfo(numFiles) = rrInfo(1);
 if ~isempty(errors)
    error(['Bad parameters: ' cell2str(errors)]);
 end
-params.rrBlockStepMinutes = 5.0;
+params.rrBlockStepMinutes = 0.5;
 % params.rrsAroundOutlierAmpPeaks = 0;
 % params.rrOutlierNeighborhood = 0;
 % params.removeOutOfRangeRRs = false;

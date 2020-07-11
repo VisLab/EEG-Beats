@@ -1,9 +1,9 @@
 %% Run n-way analysis of variance on pairs of factors
 
-peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data\rrInfo.mat';
+peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval30SecStep.mat';
 metaFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Meta\meta.mat';
-analysisDir = 'D:\TestData\NCTU_RWN_Heart_Analysis\anova';
+analysisDir = 'D:\TestData\NCTU_RWN_Heart_Analysis_Data2\anova';
 
 %% Set the parameters
 metaVariables = {'subject', 'task',  'group'};
