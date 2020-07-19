@@ -15,3 +15,47 @@ in batch mode. All of these scripts are in the `scripts` subdirectory.
 > `runProcessEkg` calls `pop_eegbeats` on a directory tree containing EEG files and
 > produces both a `ekgPeaks` data structure and `rrInfo` structure for the study in one step.    
 
+### Visualizations
+
+>  `runFeatureTSNE`
+
+>  `runShowDistributions.m`
+
+
+
+
+### Analysis of variance
+
+> `runAnova.m`
+
+>  `runAnova2.m`
+
+>  `runAnova3.m`
+
+>  `runAnova2bySubject.m`
+
+>  `runCountSignficant.m`
+
+
+### Informational
+
+> `runCompareFlipped`
+
+> `runCountDatasetsForRRComparison.m`
+
+> `runCreateMeta.m`
+
+> `runOutputSummaryCounts.m`
+
+>  `runOutputTxt.m`
+
+>  `runSummarizeManualReview`
+
+
+### Comparisons
+
+> `runComparePNCPeaks`
+
+>  `runComparePNCRRMeasures.m`
+
+>
