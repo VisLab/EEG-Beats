@@ -44,7 +44,7 @@ their default settings.
 
 
 **Example** The following example creates an empty `params` structure, sets the `rrMinMs` parameter to 400 ms
-and then fills the structure with the default values for all other parameters.
+and, then fills the structure with the default values for all other parameters.
 
     params = struct();
     params.rrMinMs = 400;
