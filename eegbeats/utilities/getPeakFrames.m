@@ -30,25 +30,23 @@ flipIntervalFrames = round(params.flipIntervalSeconds * params.srate);
 threshold = params.threshold*1.4826*mad(ekg,1);
 
 %% Determine whether or not to flip the ekg signal
-flip = getFlipDirection(ekg, flipIntervalFrames, threshold);
-if flip == -1
-    return;
-elseif params.forceFlip
-    flip = 1;
+if params.flipDirection == 0
+   flip = getFlipDirection(ekg, flipIntervalFrames, threshold);
+else
+    flip = params.flipDirection;
 end
 if flip > 0
     ekg = -ekg;
 end
 
-%upperLargeThreshold = params.stdLargeThreshold*1.4826*mad(ekg,1);
 if ~singlePeak
     sigRight = getTroughSide(ekg, flipIntervalFrames, qrsHalfFrames, threshold);
 else
-    sigRight = true;
+    sigRight = 1;
 end
 if sigRight == -1
     return;
-elseif ~sigRight 
+elseif sigRight == 0 
     ekg = fliplr(ekg);
 end
 

@@ -2,13 +2,13 @@ function rightSide = getTroughSide(ekg, framesPerInterval, qrsFrames, threshold)
 %% Compare multiple different intervals to determine if to flip
 % Parameters:
 %       ekg             the data to get the consensus
-%       consType        the type of consensus to get
-%                       (1 = flip, 2 = peakDir)
+%       framesPerInterval
+%       qrsFrames
+%       threshold
 % Result:
-%       cons            if consType = 1;
-%                           true = flip, false = not flip
-%                       if consType = 2;
-%                           true = troughRight, false = troughLeft
+%       rightSide: 1  (more likely to right)
+%                  0  (more like to left)
+%                  -1 (not enough troughs detected to decide)
 %%
 % Get starting frames for generating consensus
     numIntervals = floor(length(ekg)/framesPerInterval);

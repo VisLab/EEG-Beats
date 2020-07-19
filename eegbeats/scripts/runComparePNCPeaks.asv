@@ -84,8 +84,8 @@ sessions = zeros(length(peakCompare), 1);
 for k = 1:length(sessions)
     sessions(k) = str2num(peakCompare(k).session); %#ok<ST2NM>
 end
-[sorted, sortInd] = sort(sessions);
-peakCompare = peakCompare(sortInd);
+[sorted, sortedInd] = sort(sessions);
+peakCompare = peakCompare(sessions);
 %% Output the report
 ebNumPeaks = cell2mat({peakCompare.numPeaksEB});
 pncNumPeaks = cell2mat({peakCompare.numPeaksPNC});
