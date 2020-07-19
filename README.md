@@ -33,4 +33,20 @@ The `scripts` subdirectory has an extensive collection of scripts that are desig
 in batch mode on an entire study. A detailed list of scripts appears in the `README.md` file located
 in this subdirectory.  
 
+### Setting EEG-Beats parameters
+All parameters in EEG-Beats are settable.  EEG-Beats uses a `params` structure to hold the 
+parameters. The following functions are useful for listing the values of the parameters and setting them.  
+
+**Example** The following command on the command line lists all EEG-Beat parameters and
+their default settings.
+
+    outputBeatDefaults(); 
+
+
+**Example** The following example creates an empty `params` structure, sets the `rrMinMs` parameter to 400 ms
+and then fills the structure with the default values for all other parameters.
+
+    params = struct();
+    params.rrMinMs = 400;
+    params = checkBeatDefaults(params, params, getBeatDefaults());
 
