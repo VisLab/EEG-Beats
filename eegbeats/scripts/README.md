@@ -17,22 +17,21 @@ in batch mode. All of these scripts are in the `scripts` subdirectory.
 
 ### Visualizations
 
->  `runFeatureTSNE`
+>  `runShowRRMeasureBoxplots.m` displays boxplots of RR measures segregated by metadata variable. 
 
->  `runShowDistributions.m`
-
-
+>  `runShowRRMeasureTSNE` displays 2D or 3D TSNE projection plots colored by metadata variable.
 
 
-### Analysis of variance
 
-> `runAnova.m`
+### Analysis of variance (ANOVA)
 
->  `runAnova2.m`
+>  `runAnova1.m` runs single factor ANOVA on RRMeasures using a metadata factor variable.
 
->  `runAnova3.m`
+>  `runAnova2.m` runs two-factor ANOVA on RRMeasures using 2 metadata factor variables.
 
->  `runAnova2bySubject.m`
+>  `runAnova3.m` runs three-factor ANOVA on RRMeasures using 3 metadata factor variables.
+
+>  `runAnova2bySubject.m` 
 
 >  `runCountSignficant.m`
 

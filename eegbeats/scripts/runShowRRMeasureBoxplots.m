@@ -1,34 +1,34 @@
-%% Display box plots of the distributions of the indicators by variable
-
+%% Display boxplots of RR measures segregated by metadata variable
 
 %% Set the file names
-peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\ekgPeaks.mat';
-infoFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\rrInfo.mat';
-metaFile = 'D:\TestData\NCTU_RWN_VDE_Heart\meta.mat';
-analysisDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Analysis\anova1';
+peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
+infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval30SecStep.mat';
+metaFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Meta\meta.mat';
+plotDir = 'D:\TestData\NCTU_RWN_Heart_Analysis_Data2\boxplots';
 
 %% Set the parameters
-metaVariables = {'subject', 'group', 'task'};
-rrMeasures = {'meanHR', 'meanRR', 'medianRR', 'SDNN', 'SDSD', 'RMSSD', ...
-              'NN50', 'pNN50', 'totalPower', 'VLF', 'LF', 'LFnu', ...
-              'HF', 'HFnu', 'LFHFRatio'};
+%metaVariables = {'subject', 'group', 'task'};
+metaVariables = {'subject'};
+% rrMeasures = {'meanHR', 'meanRR', 'medianRR', 'SDNN', 'SDSD', 'RMSSD', ...
+%               'NN50', 'pNN50', 'totalPower', 'VLF', 'LF', 'LFnu', 'LFHFRatio'};
+rrMeasures = {'LFnu'};
 %rrMeasureTypes = {'overallValues', 'blockValues'};
 rrMeasureTypes = {'blockValues'};
 rrScalingTypes = {'None', 'Subtract', 'Divide'};
 scalingTask = 'Pre_EXP_resting';
-%figFormats = {'.png', 'png'; '.fig', 'fig'; '.pdf' 'pdf'; '.eps', 'epsc'};
-figFormats = {'.png', 'png'};
-figClose = true;
-
+figFormats = {'.png', 'png'; '.fig', 'fig'; '.pdf' 'pdf'; '.eps', 'epsc'};
+%figFormats = {'.png', 'png'};
+%figClose = true;
+figClose = false;
 %% Make sure that the plot directory exists
-if ~isempty(analysisDir) && ~exist(analysisDir, 'dir')
-    mkdir(analysisDir)
+if ~isempty(plotDir) && ~exist(plotDir, 'dir')
+    mkdir(plotDir)
 end
 
 %% Load the info file
 temp = load(infoFile);
 params = temp.params;
-rrInfo = temp.RRInfo;
+rrInfo = temp.rrInfo;
 
 %% Load the metadata file
 temp = load(metaFile);
@@ -69,7 +69,6 @@ metadata = metadata(metaIndex);
 rrInfo(metaIndex == 0) = [];
 
 %% Plot the box plots
-count = 0;
 for k = 1:length(rrMeasureTypes)
     [rrValues, rrPositions] = ...
         consolidateRRMeasures(rrInfo, rrMeasureTypes{k}, rrMeasures);
@@ -109,56 +108,29 @@ for k = 1:length(rrMeasureTypes)
             scalingString = ['Scaled by dividing ' scalingTask];
             scalingLine = 1;
         end
-        scaledPositions = rrPositions(taskMask);
-        
-        metaLabels = cell(length(rrScaledValues), length(metaVariables));
         for g = 1:length(metaVariables)
             if ~isfield(metadata, metaVariables{g})
-                error('%s is not a field of metadata...', metaVariables{g});
+                warning('%s is not a field of metadata...skipping', metaVariables{g});
+                continue;
             end
             thisMeta = {metadata.(metaVariables{g})};
-            metaLabels(:, g) = thisMeta(scaledPositions);
-        end
-        
-        %% Now scale the data before doing tsne
-        rrScaledValues1 = bsxfun(@minus, rrScaledValues, mean(rrScaledValues));
-        rrScaledValues1 = bsxfun(@rdivide, rrScaledValues1, std(rrScaledValues));
-        siteShapes = {'<', 'o', '>', 's', 'd', '*', 'x'};
-        %% 
-        for g = 1:length(metaVariables)
-            uniqueMeta = unique(metaLabels(:, g));
-            for m = 1:length(uniqueMeta)
-                metaMask = strcmpi(metaLabels(:, g), uniqueMeta{m});
-                theseValues = rrScaledValues1(metaMask, :);
-                theseLabels = metaLabels(metaMask, :);
-                theseLabels(:, g) = [];
-                tsneValues = tsne(theseValues);
+            groups = thisMeta(rrPositions);
+            groups = groups(taskMask);
+            for m = 1:length(rrMeasures)
+                theseValues = rrScaledValues(:, m);
+                valueMask = ~isnan(theseValues);
+                theseValues = theseValues(valueMask);
+                theseGroups = groups(valueMask);
+                fprintf('%s: %s has %d nans\n', metaVariables{g}, rrMeasures{m}, sum(~valueMask));
                 
-                baseTitle = [metaVariables{g} ' ' uniqueMeta{m}];
-                figure('Name', baseTitle)
-                gscatter(tsneValues(:, 1), tsneValues(:, 2), theseLabels(:, 2));
-                title(baseTitle);
-                
-                legendString = {};
-theLimits = [-60, 60];
-hFigSite = figure('Name', ['By site: ' theTitle]);
-hold on
-for n = 1:numStudies
-    if uniqueStudies(n) == 0
-        continue;
-    end
-    for m = 1:numSites
-        thisMask = legendSites(:, 1) == m & legendSites(:, 2) == n;
-        if sum(thisMask) == 0
-            continue;
-        end
-        
-        plot(tsneResults(thisMask, 1), tsneResults(thisMask, 2), ...
-            'Color', studyColors(n, :), 'LineStyle', 'none', 'LineWidth', 0.5, ...
-            'MarkerSize', 10, 'Marker', siteShapes{m});
-        legendString{end + 1} = [sites{m} '-' studies{uniqueStudies(n), shortPos}]; %#ok<AGROW>
-    end
-end
+                %% Now plot the box plot
+                baseTitle = {[rrMeasures{m} ' ' rrMeasureTypes{k} ' grouped by '  ...
+                      metaVariables{g}]; scalingString};
+                hFig = makeFactorBoxplot(theseValues, theseGroups, ...
+                                rrMeasures{m}, metaVariables{g}, baseTitle, scalingLine);
+                saveName = [rrMeasures{m} '_groupedBy_' metaVariables{g} '_' ...
+                    rrMeasureTypes{k} '_Scaling_' rrScalingTypes{s}];
+                saveFigures(hFig, [plotDir filesep saveName], figFormats, figClose);
             end
         end
     end

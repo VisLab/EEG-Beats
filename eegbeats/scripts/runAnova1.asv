@@ -1,4 +1,4 @@
-%% Run single factor ANOVA on RRMeasures using a metadata factor variable.
+%% Run anova analysis on a single RRMeasure using metadata factor v
 
 %% Set the file names
 peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\ekgPeaks.mat';

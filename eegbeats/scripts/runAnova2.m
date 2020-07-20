@@ -1,4 +1,4 @@
-%% Run n-way analysis of variance on pairs of factors
+%% Run two-factor ANOVA on RRMeasures using 2 metadata factor variables.
 
 peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
 infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval30SecStep.mat';

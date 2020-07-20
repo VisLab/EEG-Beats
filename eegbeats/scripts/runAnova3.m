@@ -1,4 +1,4 @@
-%% Run n-way analysis of variance on a triple of factors
+%% Run three-factor ANOVA on RRMeasures using 3 metadata factor variables.
 peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
 infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval30SecStep.mat';
 metaFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Meta\meta.mat';
