@@ -31,16 +31,17 @@ in batch mode. All of these scripts are in the `scripts` subdirectory.
 
 >  `runAnova3.m` runs three-factor ANOVA on RRMeasures using 3 metadata factor variables.
 
->  `runAnova2bySubject.m` 
+>  `runAnova2bySubject.m` runs two-factor ANOVA on RRMeasures separately for individual subjects.
 
->  `runCountSignficant.m`
+>  `runCountSignficant.m` creates a table with counts of the number measures for which a factor is significant.
 
 
 ### Informational
 
-> `runCompareFlipped`
+> `runCompareFlipped` calculate ekgPeaks forcing flip and noflip for specified list of sessions.
+>  This script is used after manual review to re-analyze datasets with suspect peak finding.
 
-> `runCountDatasetsForRRComparison.m`
+> `runCountDatasetsForRRComparison.m` summarizes how many datasets had valid first blocks for EEG-Beats and PNC.
 
 > `runCreateMeta.m`
 
