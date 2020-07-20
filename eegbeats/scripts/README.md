@@ -47,15 +47,17 @@ in batch mode. All of these scripts are in the `scripts` subdirectory.
 
 > `runOutputSummaryCounts.m` outputs counts of number of peaks and RR measures in various categories.
 
->  `runOutputTxt.m`
+>  `runOutputTxtIBIs.m` converts peak positions to two-column text files with position and IBI.
 
->  `runSummarizeManualReview`
+>  `runStepThroughImages.m` steps through the .fig files in a directory for manual review.
+
+>  `runSummarizeManualReview` reads spreadsheets of manual review into table and summarizes.
 
 
 ### Comparisons
 
-> `runComparePNCPeaks`
+> `runComparePNCPeaks` compares peaks from EEG-Beats (EB) and PhysioNet Cardiovascular Signal Toolbox (PNC).
 
->  `runComparePNCRRMeasures.m`
+>  `runComparePNCRRMeasures.m` compares EEG-Beat RR measures with previously computed PNC measures.
 
 >

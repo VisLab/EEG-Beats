@@ -1,4 +1,4 @@
-%% Step through the images and to view
+%% Step through the .fig files in a directory for manual review.
 
 %% Set the paths
 imageDir = 'D:\TestData\NCTU_RWN_VDE_IBI_Images6';

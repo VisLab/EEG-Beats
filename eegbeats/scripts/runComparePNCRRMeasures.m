@@ -1,4 +1,4 @@
-%% Script to compare EEG-Beat RR measures with previously computed PNC values
+%% Compare EEG-Beat RR measures with previously computed PNC measures.
 
 %% Set the file locations
 infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfo.mat';

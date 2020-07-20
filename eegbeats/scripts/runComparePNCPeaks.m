@@ -1,4 +1,4 @@
-%% Compare peaks from EEG-Beats (EB) and PhysioNet Cardiovascular Signal Toolbox (PNC)
+%% Compare peaks from EEG-Beats (EB) and PhysioNet Cardiovascular Signal Toolbox (PNC).
 
 %% Set the filenames for the comparison
 ekgFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';

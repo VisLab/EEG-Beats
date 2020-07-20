@@ -1,4 +1,4 @@
-%% This script counts how many first blocks were able to have computations.
+%% Read spreadsheets of manual review into table and summarize.
 
 %compareFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2/EBPNCCompare.mat';
 reviewFile = 'D:\Papers\Current\Heart\ekgPeaksReducedCombined.xlsx';

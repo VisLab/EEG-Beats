@@ -1,8 +1,9 @@
-%% Convert files to text files
+%% Convert peak positions to two-column text files with position and IBI.
 
+%% Set up the file names
 ekgFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_12\ekgPeaks.mat';
-ibiFile = 'D:\TestData\NCTU_RWN_VDE_IBIs_12\ibiInfoA.mat';
 outputDir=  'D:\TestData\NCTU_RWN_VDE_IBIs_TXT_12';
+
 %% Load the files the heartbeat file
 temp = load(ekgFile);
 ekgPeaks = temp.ekgPeaks;
