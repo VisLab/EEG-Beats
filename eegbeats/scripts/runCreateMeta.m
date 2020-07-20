@@ -1,8 +1,15 @@
-%% Example script to create a meta structure from existing metadata
-% The meta structure should have fileName, subName files to heart beat
-% structures
-% Other fields will be treated as fixed effect catagorical data.
-
+%% Create a correctly-formated metadata structure from existing metadata.
+%
+% EEG-Beats requires a metadata structure in a specified format in order to
+% do analysis of variance and its boxplots and TSNE visualizations. The
+% first field of the metadata structure should be the fileName. This
+% fileName should be exactly the same file name as the one appearing in
+% both the ekgPeaks structure and the rrInfo structure. EEG-Beats uses the
+% fileName as a key to match metadata to RR measures. 
+%
+% All other fields in the structure will be treated as fixed effect
+% categorical data. EEG-Beats uses the field name as the factor name.
+%
 %% Set up directory and load the files
 metadataFile = ['D:\TestData\Level1WithBlinks\NCTU_RWN_VDE\additional_documentation' ...
                filesep 'NCTU_RWN_VDE_metadata.mat'];   

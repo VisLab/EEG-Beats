@@ -43,9 +43,9 @@ in batch mode. All of these scripts are in the `scripts` subdirectory.
 
 > `runCountDatasetsForRRComparison.m` summarizes how many datasets had valid first blocks for EEG-Beats and PNC.
 
-> `runCreateMeta.m`
+> `runCreateMeta.m` creates a correctly-formated metadata structure from existing metadata.
 
-> `runOutputSummaryCounts.m`
+> `runOutputSummaryCounts.m` outputs counts of number of peaks and RR measures in various categories.
 
 >  `runOutputTxt.m`
 

@@ -1,9 +1,11 @@
-%% Output basic statistics
+%% Outputs counts of number of peaks and RR measures in various categories.
 
+%% Set up the file names
 % peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data1\ekgPeaks.mat';
 % infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data1\rrInfo.mat';
 peakFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\ekgPeaks.mat';
 infoFile = 'D:\TestData\NCTU_RWN_VDE_Heart_Data2\rrInfoWithRemoval.mat';
+
 %% Load the files
 temp = load(peakFile);
 ekgPeaks = temp.ekgPeaks;
