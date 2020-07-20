@@ -1,5 +1,4 @@
-%% Run n-way analysis of variance on pairs of factors broken down by subject
-
+%% Run two-factor ANOVA on RRMeasures separately for individual subjects.
 
 %% Set the file names
 peakFile = 'D:\TestData\NCTU_RWN_VDE_IBIs\ekgPeaks.mat';

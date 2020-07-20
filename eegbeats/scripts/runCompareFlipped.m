@@ -1,5 +1,4 @@
-%% Calculate the peaks and create the images forcing flip or noflip for sessions
-%
+%% Calculate ekgPeaks forcing flip and noflip for specified list of sessions
 
 %% Set the base paths and specify which sessions
 rawDir = 'D:\TestData\Level1WithBlinks\NCTU_RWN_VDE';

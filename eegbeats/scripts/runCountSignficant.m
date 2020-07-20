@@ -1,16 +1,16 @@
-%% Produce a table of counts
+%% Create a table with counts of the number measures for which a factor is significant.
 
+%% Set up the file
 anovaFile = 'D:\TestData\NCTU_RWN_Heart_Analysis\anova\anova2Measures.mat';
 
-rrScalingTypes = {'None', 'Subtract', 'Divide'};
-%%
+%% Load the previously computed ANOVA resuls
 temp = load(anovaFile);
 anova2Info = temp.anova2Info;
 
-%% 
+%% Set up the structures and parameters
 sig = 0.05;
 hSig = 0.001;
-
+rrScalingTypes = {'None', 'Subtract', 'Divide'};
 typeMask = strcmpi({anova2Info.type}, 'blockValues');
 anova2Info = anova2Info(typeMask);
 template = struct('measure', NaN, 'numValues', 0);
@@ -49,7 +49,6 @@ for k = 1:length(measures)
         thisCount.(['Sig_' rrScalingTypes{s} '_1x2_p']) = sum(theseValues <= sig);
         thisCount.(['HSig_' rrScalingTypes{s} '_1x2_p']) = sum(theseValues <= hSig);
     sigCount(k) = thisCount;
-
     end
 end
 sigCount(numMeasures + 1).measure = 'Total count';
