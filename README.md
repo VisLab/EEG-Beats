@@ -1,4 +1,4 @@
-# EEG-Beats
+# EEG-Beats Develop branch
 Matlab toolbox to analyze heart rate variability (HRV) in conjunction with EEG
 
 This MATLAB toolbox extracts heartbeat peaks and interbeat interval measures
