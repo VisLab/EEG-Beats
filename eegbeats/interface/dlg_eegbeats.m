@@ -1,4 +1,4 @@
-% dlg_blinker - GUI for entering BLINKER parameters
+% dlg_blinker - GUI for entering BLINKER parameters temporary example
 %
 
 % This program is free software; you can redistribute it and/or modify
