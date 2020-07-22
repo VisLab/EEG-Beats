@@ -11,7 +11,7 @@ under development.
 EEG-Beats is freely available under the GNU General Public License. 
 Please cite the following publication if using:  
 > Thanapaisal S, Mosher S, Trejo B and Robbins KA (2020)  
-> EEG-Beats: Automated analysis of heart rate variability (HVR) from EEG-EKG
+> EEG-Beats: Automated analysis of heart rate variability (HVR) from EEG-EKG  
 > [https://biorxiv.org/cgi/content/short/2020.07.21.211862v1](https://biorxiv.org/cgi/content/short/2020.07.21.211862v1)
 
 ### Running EEG-Beats
