@@ -4,7 +4,7 @@ function [rrInfo, params] = eeg_ekgstats(ekgPeaks, params)
 %% Check the parameters
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
 if ~isempty(errors)
-    error(['eeg_ekgstats has invalid input parameters' cell2str(errors)]);
+    error(['eeg_ekgstats has invalid input parameters' convertCell2Str(errors)]);
 end
 
 %% Get the empty structures an fill in basic information

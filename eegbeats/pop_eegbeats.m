@@ -52,7 +52,7 @@ function [ekgPeaks, rrInfo, params, com] = pop_eegbeats(EEG, params)
        [params, okay] = dlg_eegbeats(getBeatDefaults());
        [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
        if ~isempty(errors)
-           warndlg2(['Invalid parameters: ' cell2str(errors)]);
+           warndlg2(['Invalid parameters: ' convertCell2Str(errors)]);
            return;
        end
     end
@@ -65,7 +65,7 @@ function [ekgPeaks, rrInfo, params, com] = pop_eegbeats(EEG, params)
 %% Check the parameters against the defaults
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
 if ~isempty(errors)
-    warning(['pop_eegbeats has invalid input parameters' cell2str(errors)]);
+    warning(['pop_eegbeats has invalid input parameters' convertCell2Str(errors)]);
     return;
 end
     

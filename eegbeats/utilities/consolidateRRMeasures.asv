@@ -7,7 +7,7 @@ function  [rrValues, rrPositions] = consolidateRRMeasures(rrInfo, rrType, rrMeas
 %    rrMeasures      Cell array with RR measure names
 %
 % Note: This function is used for statistical analysis and visualization, 
-% where information is needed as vectors rather than structures.
+% where information is needed as vectors rather than s.
 %
 
 %% Initialize

@@ -18,7 +18,7 @@ numFiles = length(ekgPeaks);
 rrInfo(numFiles) = rrInfo(1);
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());
 if ~isempty(errors)
-   error(['Bad parameters: ' cell2str(errors)]);
+   error(['Bad parameters: ' convertCell2Str(errors)]);
 end
 params.rrBlockStepMinutes = 0.5;
 % params.rrsAroundOutlierAmpPeaks = 0;
