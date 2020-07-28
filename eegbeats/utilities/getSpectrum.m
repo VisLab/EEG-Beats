@@ -1,9 +1,22 @@
 function [pSpectrum, f] = getSpectrum(RRs, ts, params)
-
+%% Compute the spectrum given the RR intervals, times and parameters
+%
+%  Parameters:
+%      RRs    1-D array with RR intervals
+%      ts     1-D array with times of the RR samples
+%      params EEG-Beats parameter structure
+%      pSpectrum  (output) 1-D array with spectrum
+%      f          (output) 1-D array with frequencies in Hz
+%
+% NOTE:  Only params.spectrumType of 'lomb' is recommended. Types of 'ar'
+% and 'fft' have not been fully tested.
+%% Compute the spectrum
     sType = params.spectrumType;
     if strcmpi(sType, 'ar')
+        warning('Computing spectrum using AR methods is not supported at this time');
         [pSpectrum, f, modelOrder] = getAR(RRs, params);
     elseif strcmpi(sType, 'fft')
+        warning('Computing spectrum using FFT methods is not supported at this time');
         [pSpectrum, f] = getWelch(RRs, ts, params);
     else
         [pSpectrum, f] = plomb(RRs, ts, params.freqCutoff);
