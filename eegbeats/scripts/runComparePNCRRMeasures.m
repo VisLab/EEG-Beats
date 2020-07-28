@@ -52,7 +52,7 @@ for k = 1:numFields
     compareInfo(k) = compareInfo(end);
     compareInfo(k).EBName = fields{k, 1};
     compareInfo(k).PNCName = fields{k, 2};
-    compareInfo(k).EBValues = getEBValuesFromStructure(rrInfo, fields{k, 1});
+    compareInfo(k).EBValues = getFirstBlockValuesFromStructure(rrInfo, fields{k, 1});
     compareInfo(k).EBMask = ~isnan(compareInfo(k).EBValues);
     if strcmpi(fields{k, 2}, '-')
         continue;

@@ -1,5 +1,5 @@
-function values = getEBValuesFromStructure(rrInfo, fieldName)
-
+function values = getFirstBlockValuesFromStructure(rrInfo, fieldName)
+%% Return an array with the values of fieldName from the first block
 values = nan(length(rrInfo), 1);
 for k = 1:length(rrInfo)
     if ~isstruct(rrInfo(k).blockValues) && isnan(rrInfo(k).blockValues)
