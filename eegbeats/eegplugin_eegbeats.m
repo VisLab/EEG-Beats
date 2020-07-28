@@ -23,7 +23,7 @@
 %
 
 function vers = eegplugin_eegbeats(fig, trystrs, catchstrs) 
-
+%% The GUI for this function is in progress
 
 %% Add path to eegbeats subdirectories if not in the list
 myPath = fileparts(mfilename('fullpath'));

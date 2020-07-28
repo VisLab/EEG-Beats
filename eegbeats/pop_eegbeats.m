@@ -31,7 +31,7 @@
 % Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 function [ekgPeaks, rrInfo, params, com] = pop_eegbeats(EEG, params)
-%% Initialize the return values
+%% EEGLAB function to call entire pipeline on one EEG dataset. 
     com = ''; % Return something if user presses the cancel button
     [ekgPeaks, rrInfo] = getEmptyBeatStructs();
     okay = true;

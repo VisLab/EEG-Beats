@@ -1,11 +1,16 @@
 function [rrInfo, params] = eeg_ekgstats(ekgPeaks, params)
-%% Top-level function to create an rrInfo structure from an ekgPeaks 
+% Compute the rrInfo structure from the ekgPeaks structure
+%% Top level function to create an RRin
 %
 %  Parameters:
-%    ekgPeaks   structure containing peak information for one dataset
-%    params     EEG-Beats parameters 
-%    rrInfo    (Output) structure with RR interval and measures info for one dataset
-%    params    (Output) EEG-Beats parameters updated with ones used
+%    EEG      EEGLAB EEG structure with the EEG data recording
+%    params   EEG-Beats parameters
+%    ekgPeaks (Output) ekgPeaks structure for one dataset
+%    params   (Output) EEG-Beats parameters updated with those used
+%    hFig1    (Output) Figure handle to plot of ekg with peaks overlaid
+%    hFig2    (Output) Figure handle to plot of ekg peak amp versus RR interval   
+%    hFig3    (Output) Figure handle to plot of ekg with RR intervals overlaid
+%    hFig4    (Output) Figure handle to plot of ekg and RR interval subplot 
 %
 %% Check the parameters
 [params, errors] = checkBeatDefaults(params, params, getBeatDefaults());

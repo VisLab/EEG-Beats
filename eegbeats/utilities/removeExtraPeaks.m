@@ -1,12 +1,24 @@
 function [peakFramesNew, lowAmplitudePeaks, highAmplitudePeaks] = ...
                             removeExtraPeaks(ekg, peakFrames, params)
 %% Remove the small extra peaks in each method (assumes oriented upward)
+%
+%  Parameters:
+%     ekg                 1-D array containing ekg signal
+%     peakFrames          Frame positions of the peaks
+%     params              EEG-Beats parameters
+%     peakFramesNew      (Output) Frame positions after extras are removed
+%     lowAmplitudePeaks  (Output) Frame positions of low amplitude peaks
+%     highAmplitudePeaks (Output) Frame positions of high amplitude peaks
+%
+%% Initialize the return values
     if isempty(peakFrames) || (isscalar(peakFrames) && isnan(peakFrames))
         peakFramesNew = [];
         lowAmplitudePeaks = [];
         highAmplitudePeaks = [];
         return;
     end
+    
+%% Calculate the limits
     maxRRFrames = round(params.rrMaxMs.*params.srate./1000);
     rrs = peakFrames(2:end) - peakFrames(1:end-1);
     rrs(rrs > maxRRFrames) = [];
