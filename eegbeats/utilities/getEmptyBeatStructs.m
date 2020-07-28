@@ -1,5 +1,8 @@
 function [ekgPeaks, rrInfo, rrMeasures] = getEmptyBeatStructs()
-
+%% Return empty structures for peaks, RR information and RR measures
+%
+%  Note: This function is used for efficiency to preallocate structures
+%% Get the structures
 ekgPeaks = struct('fileName', NaN, 'srate', NaN, 'ekg', NaN, ...
     'peakFrames', NaN, 'lowAmplitudePeaks', NaN, 'highAmplitudePeaks', NaN);
               

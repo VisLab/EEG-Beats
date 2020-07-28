@@ -1,8 +1,19 @@
 function [allRRs, masks, maskTypes] = getRRsFromPeaks(peakFrames, lowAmpPeaks, highAmpPeaks, params)
-%% Get the RRs from the peak frames
+%% Get the RRs from the peak frames with masks for different types
 %
 %  Parameters:
+%     peakFrames   1-D array with peak positions in frames
+%     lowAmpPeaks  1-D array with low amplitude peak positions
+%     highAmpPeaks 1-D array with high amplitude peak positions
+%     params       EEG-Beats parameters
+%     allRRs       (Output) 2-D array with positions of second RR interval 
+%                  peaks in first column and RR intervals in the second column
+%     masks        (Output) n x M array with M masks in the column (n is # RRs)
+%     maskTypes    (Output) Cell array of length M with the names of the masks
 %
+% Provides masks for different types of outlier detection for plotting and
+% analysis
+%% Initialize the output structures
 numRRs = length(peakFrames(2:end));
 allRRs = zeros(numRRs, 2);
 allRRs(:, 1) = peakFrames(2:end);
