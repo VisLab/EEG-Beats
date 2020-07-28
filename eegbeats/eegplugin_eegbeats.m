@@ -28,7 +28,7 @@ function vers = eegplugin_eegbeats(fig, trystrs, catchstrs)
 %% Add path to eegbeats subdirectories if not in the list
 myPath = fileparts(mfilename('fullpath'));
 addpath(fullfile(myPath, 'utilities'));
-vers = getBeatVersion(); 
+vers = getEEGBeatsVersion(); 
 
 % create menu
 comprep = [trystrs.no_check '[ekgPeaks, LASTCOM] = pop_eegbeats(EEG);' catchstrs.new_and_hist];

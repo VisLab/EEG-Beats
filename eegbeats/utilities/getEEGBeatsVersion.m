@@ -1,5 +1,5 @@
-function [currentVersion, changeLog, markdown] = getBeatVersion()
-
+function [currentVersion, changeLog, markdown] = getEEGBeatsVersion()
+%% Get the current EEG-Beats version and the markdown for the changelog.
     changeLog = getChangeLog();
     currentVersion = ['eegbeats' changeLog(end).version]; 
     markdown = getMarkdown(changeLog);
@@ -10,10 +10,10 @@ function changeLog = getChangeLog()
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
     changeLog(1).version = '1.0';
-    changeLog(1).status = 'Unreleased';
-    changeLog(1).date = '4/19/2020';
+    changeLog(1).status = 'Released';
+    changeLog(1).date = '7/28/2020';
     changeLog(1).changes = { ...
-       'Initial organization of eegbeats as an EEGLAB plugin'};
+       'Initial release of EEG-Beats sans EEGLAB plugin gui'};
 end
 
 function markdown = getMarkdown(changeLog)
