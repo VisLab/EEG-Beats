@@ -55,6 +55,7 @@ function [ekgPeaks, rrInfo, params, com] = pop_eegbeats(EEG, params)
            warndlg2(['Invalid parameters: ' cell2str(errors)]);
            return;
        end
+       %
     end
 
     %% Return if user pressed cancel or if bad parameters
