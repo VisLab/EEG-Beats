@@ -264,15 +264,14 @@ uilist = { ...
       'TooltipString', params.figureClose.description},...
     { 'Style', 'checkbox', 'Value', params.figureClose.value, ...
       'horizontalalignment', 'left', 'tag',  'figureClose', ...
-      'TooltipString', params.figureClose.description},...                               
+      'TooltipString', params.figureClose.description},...   
     { 'Style', 'text', 'string', 'figureVisibility', ...
       'horizontalalignment', 'right', ...
       'TooltipString', params.figureVisibility.description},... 
     { 'Style', 'popupmenu', 'string', 'on|off', ...
-      'value', figureVisValue, 'horizontalalignment', 'left',...
+      'Value', figureVisValue, 'horizontalalignment', 'left',...
       'tag', 'figureVisibility', ...
-       'TooltipString', params.figureVisibility.description}};                              % figureClose and figureVisibility
-
+      'TooltipString', params.figureVisibility.description}};                              % figureClose and figureVisibility   
 %% Call the GUI
 [~, ~, ~, outStruct] = inputgui('geometry', geometry, 'geomvert', geomvert, ...
         'uilist', uilist, 'title', theTitle,'helpcom', 'pophelp(''pop_eegbeats'')');
@@ -282,34 +281,33 @@ if isempty(outStruct) % Cancel was hit
 end
 %% Massage the GUI return values to fit BLINKER's expectations
 %check boxes
-outStruct.spectrumType = spectrumTypeMenu{outStruct.spectrumType};
 outStruct.figureVisibility = figureVisMenu{outStruct.figureVisibility};
+outStruct.spectrumType = spectrumTypeMenu{outStruct.spectrumType};
 outStruct.doRRMeasures = logical(outStruct.doRRMeasures);
 outStruct.removeOutOfRangeRRs = logical(outStruct.removeOutOfRangeRRs);
 outStruct.verbose = logical(outStruct.verbose);
 outStruct.doPlot = logical(outStruct.doPlot);
-outStruct.figureClip = str2double(outStruct.figureClip);
-outStruct.figureVisibility = logical(outStruct.figureVisibility);
+outStruct.figureClip = str2num(outStruct.figureClip);
 outStruct.figureClose = logical(outStruct.figureClose);
 
 % ranges
 if ~isempty(outStruct.filterHz)
-    outStruct.filterHz = sort(str2double(outStruct.filterHz)); 
+    outStruct.filterHz = sort(str2num(outStruct.filterHz)); 
 else
     outStruct.filterHz = NaN;
 end
 if ~isempty(outStruct.VLFRange)
-    outStruct.VLFRange = sort(str2double(outStruct.VLFRange)); 
+    outStruct.VLFRange = sort(str2num(outStruct.VLFRange)); 
 else
     outStruct.VLFRange = NaN;
 end
 if ~isempty(outStruct.LFRange)
-    outStruct.LFRange = sort(str2double(outStruct.LFRange)); 
+    outStruct.LFRange = sort(str2num(outStruct.LFRange)); 
 else
     outStruct.LFRange = NaN;
 end
 if ~isempty(outStruct.HFRange)
-    outStruct.HFRange = sort(str2double(outStruct.HFRange)); 
+    outStruct.HFRange = sort(str2num(outStruct.HFRange)); 
 else
     outStruct.HFRange = NaN;
 end
