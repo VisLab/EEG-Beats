@@ -1,5 +1,5 @@
 function rrMeasures = getRRMeasures(RRs, blockMinutes, params)
-%% Given a specific list of RR
+%% Given a specific list of RR intervals, return a structure with the measures
 % Parameters:
 %    RRs            nn x 2 array with positions in frames and values of RRs
 %    blockMinutes   total length in minutes of data represented peakFrames

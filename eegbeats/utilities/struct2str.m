@@ -46,7 +46,7 @@ end
 
     function str = field2str(structure, fNames, indx)
         % Checks the structure field and correctly handles it
-        if iscellstr(structure.(fNames{indx}))
+        if iscellstr(structure.(fNames{indx})) %#ok<ISCLSTR>
             str = cell2str(structure, fNames, indx);
         elseif ischar(structure.(fNames{indx}))
             str = str2str(structure, fNames, indx);

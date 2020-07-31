@@ -1,5 +1,16 @@
 function [beatValue, troughValue] = getBeatValue(signal, beatFrame, qrsHalfFrames, threshold, singlePeak)
-
+%% Return proper position of peak frame if valid peak, otherwise return empty
+%
+%  Parameters:
+%    signal         1-D ekg signal
+%    beatFrame      Frame position of the potential peak
+%    qrsHalfFrames  Maximum half-width of valid peaks
+%    threshold      Minimum amplitude of valid peaks
+%    singlePeak     If false, assume it is a peak with following trough
+%    beatValue      (Output) correct peak position or empty if ineligible
+%    troughValue    (Output) correct trough position or empty if no trough
+%
+%% Compute the correct peak position if a valid peak
     if singlePeak
         beatValue = getTwoSidedValue(signal, beatFrame, threshold, qrsHalfFrames);
         troughValue = [];

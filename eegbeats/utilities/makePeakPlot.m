@@ -1,6 +1,11 @@
 function hFig = makePeakPlot(ekgPeaks, baseTitle, params)   
 %% Creates a figure of the ekg overlaid with the peaks that it found
-
+%
+%  Parameters:
+%     ekgPeaks     ekgPeaks structure for a single dataset
+%     baseTitle    base title to be used in the figure
+%     params       EEG-Beats parameter structure
+%     hFig         (Output) 
 %%  Create a figure
     hFig = figure('Name', baseTitle, 'Visible', params.figureVisibility);
 

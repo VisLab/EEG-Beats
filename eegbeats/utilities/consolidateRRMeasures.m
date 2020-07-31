@@ -1,5 +1,16 @@
 function  [rrValues, rrPositions] = consolidateRRMeasures(rrInfo, rrType, rrMeasures)
+%% Extract measure values and row number of structure from rrInfo struct
+%
+% Parameters:
+%    rrInfo          The rrInfo structure produced by eeg_ekgstats
+%    rrType          Either 'overallValues' or 'blockValues'
+%    rrMeasures      Cell array with RR measure names
+%
+% Note: This function is used for statistical analysis and visualization, 
+% where information is needed as vectors rather than structures.
+%
 
+%% Initialize
 rrValues = [];
 rrPositions = [];
 

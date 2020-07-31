@@ -1,18 +1,29 @@
 function [peakCombined, peakLeft] = combineMethodPeaks(peakFrames, peakTwoFrames, minRRFrames)     
-
+%% Combine peaks from two methods of getting peaks
+%
+% Parameters:
+%    peakFrames      Array of peak frames from first method 
+%    peakTwoFrames   Array of peak frames from second method 
+%    minRRFrames     Minimum frames between peaks to consider distinct
+%
+% Note: This function is always called to merge peaks from single-peak and
+% peak-trough strategies, although it may be used in other situations.
+%
+%% Choose the representation with most peaks as the baseline representation
     if length(peakFrames) < length(peakTwoFrames)
         peakCombined = peakTwoFrames;
     else
         peakCombined = peakFrames;
     end
+    
+%% See which peaks aren't in the baseline representation
     peakRest = setdiff(union(peakFrames, peakTwoFrames), peakCombined);
     peakLeft = [];
     if isempty(peakRest)
         return;
     end
     
-   
-    %% Take care of peaks at the beginning
+%% Take care of peaks at the beginning
     lastInd = find(peakRest < peakCombined(1), 1, 'last');
     if ~isempty(lastInd)
         frontPeaks = peakRest(1:lastInd);
@@ -25,7 +36,8 @@ function [peakCombined, peakLeft] = combineMethodPeaks(peakFrames, peakTwoFrames
             end
         end
     end   
-     %% Take care of the peaks at the end
+    
+%% Take care of the peaks at the end
      firstInd = find(peakRest > peakCombined(end), 1, 'first');
      if ~isempty(firstInd)
         backPeaks = peakRest(firstInd:end);
@@ -43,7 +55,7 @@ function [peakCombined, peakLeft] = combineMethodPeaks(peakFrames, peakTwoFrames
          return;
      end
      
-     %% Now deal with what is left
+%% Now deal with what is left
      for k = 1:length(peakRest)
          lastInd = find(peakCombined > peakRest(k), 1, 'first');
          if isempty(lastInd)

@@ -9,9 +9,8 @@ function flip = getFlipDirection(ekg, framesPerInterval, threshold)
 %                           true = flip, false = not flip
 %                       if consType = 2;
 %                           true = troughRight, false = troughLeft
-%%
-% Get starting frames for generating consensus
-    
+%
+%% Find consensus frames and determine if flip   
     numIntervals = floor(length(ekg)/framesPerInterval);
     startFrames = (0:(numIntervals - 1))'*framesPerInterval + 1;
     endFrames = startFrames + framesPerInterval - 1;
