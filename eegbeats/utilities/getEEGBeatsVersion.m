@@ -6,8 +6,15 @@ function [currentVersion, changeLog, markdown] = getEEGBeatsVersion()
 end
 
 function changeLog = getChangeLog()
-   changeLog(1) = ...
+
+    changeLog(2) = ...
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+
+    changeLog(2).version = '1.1';
+    changeLog(2).status = 'Unreleased';
+    changeLog(2).date = '8/17/2020';
+    changeLog(2).changes = {'EEG-Beats with EEGLAB plugin gui'};
+
 
     changeLog(1).version = '1.0';
     changeLog(1).status = 'Released';

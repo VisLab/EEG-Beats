@@ -116,5 +116,6 @@ if ~isempty(hFig2)
 end
 
 %% Now set the com string
-com = sprintf('pop_params(%s, %s);', inputname(1), struct2str(params));
+com = sprintf('[ekgPeaks, rrInfo, params] = pop_eegbeats(%s, %s);', ...
+               inputname(1), struct2str(params));
 end % pop_eegbeats

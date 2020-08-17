@@ -28,6 +28,10 @@ function vers = eegplugin_eegbeats(fig, trystrs, catchstrs)
 %% Add path to eegbeats subdirectories if not in the list
 myPath = fileparts(mfilename('fullpath'));
 addpath(fullfile(myPath, 'utilities'));
+addpath(fullfile(myPath, 'scripts'));
+addpath(fullfile(myPath, 'interface'));
+addpath(fullfile(myPath, 'external'));
+addpath(fullfile(myPath, 'assets'));
 vers = getEEGBeatsVersion(); 
 
 % create menu
