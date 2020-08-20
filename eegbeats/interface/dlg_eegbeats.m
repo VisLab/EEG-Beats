@@ -300,30 +300,30 @@ outStruct.doRRMeasures = logical(outStruct.doRRMeasures);
 outStruct.removeOutOfRangeRRs = logical(outStruct.removeOutOfRangeRRs);
 outStruct.verbose = logical(outStruct.verbose);
 outStruct.doPlot = logical(outStruct.doPlot);
-outStruct.figureClip = str2num(outStruct.figureClip);
+outStruct.figureClip = str2double(outStruct.figureClip);
 outStruct.figureClose = logical(outStruct.figureClose);
 
 %convert str to num or double for reg edit box
-outStruct.srate = str2num(outStruct.srate);
-outStruct.truncateThreshold = str2num(outStruct.truncateThreshold);
-outStruct.rrMaxMs = str2num(outStruct.rrMaxMs);
-outStruct.rrMinMs = str2num(outStruct.rrMinMs);
-outStruct.threshold = str2num(outStruct.threshold);
-outStruct.qrsDurationMs = str2num(outStruct.qrsDurationMs);
-outStruct.flipIntervalSeconds = str2num(outStruct.flipIntervalSeconds);
-outStruct.consensusIntervals = str2num(outStruct.consensusIntervals);
-outStruct.maxPeakAmpRatio = str2num(outStruct.maxPeakAmpRatio);
-outStruct.minPeakAmpRatio = str2num(outStruct.minPeakAmpRatio);
-outStruct.maxWhisker = str2num(outStruct.maxWhisker);
-outStruct.rrsAroundOutlierAmpPeaks = str2num(outStruct.rrsAroundOutlierAmpPeaks);
-outStruct.rrOutlierNeighborhood = str2num(outStruct.rrOutlierNeighborhood);
-outStruct.rrPercentToBeOutlier = str2num(outStruct.rrPercentToBeOutlier);
-outStruct.rrBlockMinutes = str2num(outStruct.rrBlockMinutes);
-outStruct.rrBlockStepMinutes = str2num(outStruct.rrBlockStepMinutes);
-outStruct.detrendOrder = str2num(outStruct.detrendOrder);
-outStruct.arMaxModelOrder = str2num(outStruct.arMaxModelOrder);
-outStruct.resampleHz = str2num(outStruct.resampleHz);
-outStruct.freqCutoff = str2num(outStruct.freqCutoff);
+outStruct.srate = str2double(outStruct.srate);
+outStruct.truncateThreshold = str2double(outStruct.truncateThreshold);
+outStruct.rrMaxMs = str2double(outStruct.rrMaxMs);
+outStruct.rrMinMs = str2double(outStruct.rrMinMs);
+outStruct.threshold = str2double(outStruct.threshold);
+outStruct.qrsDurationMs = str2double(outStruct.qrsDurationMs);
+outStruct.flipIntervalSeconds = str2double(outStruct.flipIntervalSeconds);
+outStruct.consensusIntervals = str2double(outStruct.consensusIntervals);
+outStruct.maxPeakAmpRatio = str2double(outStruct.maxPeakAmpRatio);
+outStruct.minPeakAmpRatio = str2double(outStruct.minPeakAmpRatio);
+outStruct.maxWhisker = str2double(outStruct.maxWhisker);
+outStruct.rrsAroundOutlierAmpPeaks = str2double(outStruct.rrsAroundOutlierAmpPeaks);
+outStruct.rrOutlierNeighborhood = str2double(outStruct.rrOutlierNeighborhood);
+outStruct.rrPercentToBeOutlier = str2double(outStruct.rrPercentToBeOutlier);
+outStruct.rrBlockMinutes = str2double(outStruct.rrBlockMinutes);
+outStruct.rrBlockStepMinutes = str2double(outStruct.rrBlockStepMinutes);
+outStruct.detrendOrder = str2double(outStruct.detrendOrder);
+outStruct.arMaxModelOrder = str2double(outStruct.arMaxModelOrder);
+outStruct.resampleHz = str2double(outStruct.resampleHz);
+outStruct.freqCutoff = str2double(outStruct.freqCutoff);
 
 % ranges
 if ~isempty(outStruct.filterHz)
