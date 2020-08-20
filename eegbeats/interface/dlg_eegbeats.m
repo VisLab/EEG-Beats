@@ -295,7 +295,7 @@ end
 %check boxes/drop down
 outStruct.figureVisibility = figureVisMenu{outStruct.figureVisibility};
 outStruct.spectrumType = spectrumTypeMenu{outStruct.spectrumType};
-outStruct.flipDirection = flipMenu{outStruct.flipDirection};
+outStruct.flipDirection = str2num(flipMenu{outStruct.flipDirection});
 outStruct.doRRMeasures = logical(outStruct.doRRMeasures);
 outStruct.removeOutOfRangeRRs = logical(outStruct.removeOutOfRangeRRs);
 outStruct.verbose = logical(outStruct.verbose);
