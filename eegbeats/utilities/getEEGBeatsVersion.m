@@ -7,16 +7,23 @@ end
 
 function changeLog = getChangeLog()
 
-    changeLog(2) = ...
-     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+    changeLog(3) = ...
+    struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
-    changeLog(2).version = '1.1';
+    changeLog(3).version = '1.1.1';
+    changeLog(3).status = 'Released';
+    changeLog(3).date = '8/21/2020';
+    changeLog(3).changes = {'Removed figure saving from pop_eegbeats';
+                            'Removed return figures from eeg_beats';
+                            'Removed ar and fft options for spectrum'};
+
+    changeLog(2).version = '1.1.0';
     changeLog(2).status = 'Released';
     changeLog(2).date = '8/21/2020';
     changeLog(2).changes = {'EEG-Beats with EEGLAB plugin gui'};
 
 
-    changeLog(1).version = '1.0';
+    changeLog(1).version = '1.0.0';
     changeLog(1).status = 'Released';
     changeLog(1).date = '7/28/2020';
     changeLog(1).changes = { ...

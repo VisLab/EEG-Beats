@@ -75,11 +75,16 @@ if isfield(params, 'fileName') && ~isempty(params.fileName)
 elseif ~isfield(params, 'fileName') && ~isempty(EEG.filename)
     [~, theName] = fileparts(EEG.filename);
     params.fileName = theName;
+elseif ~isfield(params, 'fileName') && ~isempty(EEG.setname)
+    [~, theName] = fileparts(EEG.setname);
+    params.fileName = theName;
+elseif ~isfield(params, 'fileName')
+    params.fileName = 'unknown';
 end
 
 
 %% Now get the peaks and save things if necessary
-[ekgPeaks, params, hFig1, hFig2] = eeg_beats(EEG, params);
+[ekgPeaks, params] = eeg_beats(EEG, params);
 [rrInfo, params] = eeg_ekgstats(ekgPeaks, params);
 
 if ~isempty(params.fileDir)
@@ -90,30 +95,7 @@ if ~isempty(params.fileDir)
      save([params.fileDir filesep theName '_rrInfo.mat'], 'rrInfo', 'params', '-v7.3');
 end
 
-if ~isempty(hFig1)
-    if ~isempty(params.figureDir)
-        if ~exist(params.figureDir, 'dir')
-            mkdir(params.figureDir);
-        end
-        saveas(hFig1, [params.figureDir filesep theName '_ekgPeaks.fig'], 'fig');
-        saveas(hFig1, [params.figureDir filesep theName '_ekgPeaks.png'], 'png');
-    end
-    if strcmpi(params.figureVisibility, 'off') || params.figureClose
-        close(hFig1)
-    end
-end
-if ~isempty(hFig2)
-    if ~isempty(params.figureDir)
-        if ~exist(params.figureDir, 'dir')
-            mkdir(params.figureDir);
-        end
-        saveas(hFig2, [params.figureDir filesep theName '_RRVsPeaks.fig'], 'fig');
-        saveas(hFig2, [params.figureDir filesep theName '_RRVsPeaks.png'], 'png');
-    end
-    if strcmpi(params.figureVisibility, 'off') || params.figureClose
-        close(hFig2)
-    end
-end
+
 
 %% Now set the com string
 com = sprintf('[ekgPeaks, rrInfo, params] = pop_eegbeats(%s, %s);', ...

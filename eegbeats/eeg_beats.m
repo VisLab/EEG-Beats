@@ -1,4 +1,4 @@
-function [ekgPeaks, params, hFig1, hFig2, hFig3, hFig4] = eeg_beats(EEG, params)
+function [ekgPeaks, params] = eeg_beats(EEG, params)
 %% Top level function to create a ekgPeaks structure and figures from EEG
 %
 %  Parameters:
@@ -6,10 +6,6 @@ function [ekgPeaks, params, hFig1, hFig2, hFig3, hFig4] = eeg_beats(EEG, params)
 %    params   EEG-Beats parameters
 %    ekgPeaks (Output) ekgPeaks structure for one dataset
 %    params   (Output) EEG-Beats parameters updated with those used
-%    hFig1    (Output) Figure handle to plot of ekg with peaks overlaid
-%    hFig2    (Output) Figure handle to plot of ekg peak amp versus RR interval   
-%    hFig3    (Output) Figure handle to plot of ekg with RR intervals overlaid
-%    hFig4    (Output) Figure handle to plot of ekg and RR interval subplot 
 %
     %% Set up the return values
     ekgPeaks = getEmptyBeatStructs();

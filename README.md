@@ -52,9 +52,14 @@ and, then fills the structure with the default values for all other parameters.
     params = checkBeatDefaults(params, params, getBeatDefaults());
 
 ### Releases
-       
-Version 1.1 Released 8/21/2020
+
+Version 1.1.1 Released 8/21/2020
+* Removed figure saving from pop_eegbeats
+     * Removed return figures from eeg_beats
+     * Removed ar and fft options for spectrum 
+   
+Version 1.1.0 Released 8/21/2020
 * EEG-Beats with EEGLAB plugin gui
 
-Version 1.0 Released 7/28/2020
+Version 1.0.0 Released 7/28/2020
 * Initial release of EEG-Beats sans EEGLAB plugin gui
