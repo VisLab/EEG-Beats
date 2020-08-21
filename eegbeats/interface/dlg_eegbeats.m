@@ -291,11 +291,11 @@ if isempty(outStruct) % Cancel was hit
     okay = false;
     return;
 end
-%% Massage the GUI return values to fit EEG-Beats expectations
+%% Massage the GUI return values to fit BLINKER's expectations
 %check boxes/drop down
 outStruct.figureVisibility = figureVisMenu{outStruct.figureVisibility};
 outStruct.spectrumType = spectrumTypeMenu{outStruct.spectrumType};
-outStruct.flipDirection = round(str2double(flipMenu{outStruct.flipDirection}));
+outStruct.flipDirection = str2num(flipMenu{outStruct.flipDirection});
 outStruct.doRRMeasures = logical(outStruct.doRRMeasures);
 outStruct.removeOutOfRangeRRs = logical(outStruct.removeOutOfRangeRRs);
 outStruct.verbose = logical(outStruct.verbose);
@@ -310,41 +310,39 @@ outStruct.rrMaxMs = str2double(outStruct.rrMaxMs);
 outStruct.rrMinMs = str2double(outStruct.rrMinMs);
 outStruct.threshold = str2double(outStruct.threshold);
 outStruct.qrsDurationMs = str2double(outStruct.qrsDurationMs);
-outStruct.flipIntervalSeconds = round(str2double(outStruct.flipIntervalSeconds));
-outStruct.consensusIntervals = round(str2double(outStruct.consensusIntervals));
+outStruct.flipIntervalSeconds = str2double(outStruct.flipIntervalSeconds);
+outStruct.consensusIntervals = str2double(outStruct.consensusIntervals);
 outStruct.maxPeakAmpRatio = str2double(outStruct.maxPeakAmpRatio);
 outStruct.minPeakAmpRatio = str2double(outStruct.minPeakAmpRatio);
 outStruct.maxWhisker = str2double(outStruct.maxWhisker);
-outStruct.rrsAroundOutlierAmpPeaks = round(str2double(outStruct.rrsAroundOutlierAmpPeaks));
+outStruct.rrsAroundOutlierAmpPeaks = str2double(outStruct.rrsAroundOutlierAmpPeaks);
 outStruct.rrOutlierNeighborhood = str2double(outStruct.rrOutlierNeighborhood);
 outStruct.rrPercentToBeOutlier = str2double(outStruct.rrPercentToBeOutlier);
 outStruct.rrBlockMinutes = str2double(outStruct.rrBlockMinutes);
 outStruct.rrBlockStepMinutes = str2double(outStruct.rrBlockStepMinutes);
 outStruct.detrendOrder = str2double(outStruct.detrendOrder);
-outStruct.arMaxModelOrder = round(str2double(outStruct.arMaxModelOrder));
+outStruct.arMaxModelOrder = str2double(outStruct.arMaxModelOrder);
 outStruct.resampleHz = str2double(outStruct.resampleHz);
 outStruct.freqCutoff = str2double(outStruct.freqCutoff);
 
 % ranges
 if ~isempty(outStruct.filterHz)
-    x = sort(str2double(outStruct.filterHz))
-    size(x)
-    outStruct.filterHz = sort(str2double(outStruct.filterHz)); 
+    outStruct.filterHz = sort(str2num(outStruct.filterHz)); 
 else
     outStruct.filterHz = NaN;
 end
 if ~isempty(outStruct.VLFRange)
-    outStruct.VLFRange = sort(str2double(outStruct.VLFRange)); 
+    outStruct.VLFRange = sort(str2num(outStruct.VLFRange)); 
 else
     outStruct.VLFRange = NaN;
 end
 if ~isempty(outStruct.LFRange)
-    outStruct.LFRange = sort(str2double(outStruct.LFRange)); 
+    outStruct.LFRange = sort(str2num(outStruct.LFRange)); 
 else
     outStruct.LFRange = NaN;
 end
 if ~isempty(outStruct.HFRange)
-    outStruct.HFRange = sort(str2double(outStruct.HFRange)); 
+    outStruct.HFRange = sort(str2num(outStruct.HFRange)); 
 else
     outStruct.HFRange = NaN;
 end

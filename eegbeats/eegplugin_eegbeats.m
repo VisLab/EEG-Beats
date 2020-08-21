@@ -35,7 +35,7 @@ addpath(fullfile(myPath, 'assets'));
 vers = getEEGBeatsVersion(); 
 
 % create menu
-comprep = [trystrs.no_check '[ekgPeaks, LASTCOM] = pop_eegbeats(EEG);' catchstrs.new_and_hist];
+comprep = [trystrs.no_check '[ekgPeaks, rrInfo, params, LASTCOM] = pop_eegbeats(EEG);' catchstrs.new_and_hist];
 menu = findobj(fig, 'tag', 'tools');
 uimenu( menu, 'Label', 'Run eegbeats to get heartbeats from EKG', 'callback', comprep, ...
     'separator', 'on');

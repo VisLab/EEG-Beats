@@ -11,8 +11,8 @@ function changeLog = getChangeLog()
      struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
 
     changeLog(2).version = '1.1';
-    changeLog(2).status = 'Unreleased';
-    changeLog(2).date = '8/17/2020';
+    changeLog(2).status = 'Released';
+    changeLog(2).date = '8/21/2020';
     changeLog(2).changes = {'EEG-Beats with EEGLAB plugin gui'};
 
 
