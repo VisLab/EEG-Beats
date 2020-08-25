@@ -12,7 +12,7 @@ function changeLog = getChangeLog()
 
     changeLog(3).version = '1.1.1';
     changeLog(3).status = 'Released';
-    changeLog(3).date = '8/21/2020';
+    changeLog(3).date = '8/25/2020';
     changeLog(3).changes = {'Removed figure saving from pop_eegbeats';
                             'Removed return figures from eeg_beats';
                             'Removed ar and fft options for spectrum'};

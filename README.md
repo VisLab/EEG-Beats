@@ -53,10 +53,10 @@ and, then fills the structure with the default values for all other parameters.
 
 ### Releases
 
-Version 1.1.1 Released 8/21/2020
+Version 1.1.1 Released 8/25/2020
 * Removed figure saving from pop_eegbeats
-     * Removed return figures from eeg_beats
-     * Removed ar and fft options for spectrum 
+* Removed return figures from eeg_beats
+* Removed ar and fft options for spectrum 
    
 Version 1.1.0 Released 8/21/2020
 * EEG-Beats with EEGLAB plugin gui
