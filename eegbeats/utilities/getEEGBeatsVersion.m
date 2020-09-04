@@ -7,8 +7,14 @@ end
 
 function changeLog = getChangeLog()
 
-    changeLog(3) = ...
+    changeLog(4) = ...
     struct('version', '0', 'status', 'Unreleased', 'date', '', 'changes', '');
+
+    changeLog(4).version = '1.1.2';
+    changeLog(4).status = 'Released';
+    changeLog(4).date = '9/04/2020';
+    changeLog(4).changes = {'Removed extra line in plugin GUI';
+                            'Minor changes in documentation'};
 
     changeLog(3).version = '1.1.1';
     changeLog(3).status = 'Released';

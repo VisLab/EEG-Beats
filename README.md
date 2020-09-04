@@ -1,11 +1,12 @@
 # EEG-Beats
-Matlab toolbox to analyze heart rate variability (HRV) in conjunction with EEG
+Matlab toolbox to analyze heart rate variability (HRV) from EKG measured
+with an EEG Sensor
 
 This MATLAB toolbox extracts heartbeat peaks and interbeat interval measures
 from a single channel of EEG that has been recorded by placing an EEG
 sensor on the upper portion of the chest. Scripts provide automated
 processing for all `.set` files in a directory tree. An EEGLAB plugin is
-under development.  
+also available.  EEGLAB is required for EEG-Beats even if not run as a plugin.
 
 ### Citing EEG-Beats
 EEG-Beats is freely available under the GNU General Public License. 
@@ -14,12 +15,21 @@ Please cite the following publication if using:
 > EEG-Beats: Automated analysis of heart rate variability (HVR) from EEG-EKG  
 > [https://biorxiv.org/cgi/content/short/2020.07.21.211862v1](https://biorxiv.org/cgi/content/short/2020.07.21.211862v1)
 
-### Running EEG-Beats
+### Running EEG-Beats as an EEGLAB plugin:
+1. Install the plug-in through the EEGLAB Extension Manager: 
+         (File -> Manage EEGLAB Extensions)
 
-Download the EEG-Beats repository and add the `eegbeats` directory and all of
-its subdirectories to your MATLAB path. EEG-Beats is designed to be run in
-two stages: extract the heartbeats from the EEG and compute RR measures from the
-heartbeats.  
+   Alternatively you can directly unzip eegbeats.1.1.2.zip in the EEGLAB
+   plugins directory.
+2. Load an EEG .set file into EEGLAB
+3. Run EEG-Beats through the EEGLAB Tools menu.
+
+### Running EEG-Beats on the command line:
+
+1. Install EEG-Beats as above.
+2. EEG-Beats is designed to be run in two stages: 
+   a. Extract the heartbeats from the EEG 
+   b. Compute RR measures from the heartbeats.  
 
 ### Top-level functions
 EEG-Beats has four top level functions:
@@ -52,6 +62,10 @@ and, then fills the structure with the default values for all other parameters.
     params = checkBeatDefaults(params, params, getBeatDefaults());
 
 ### Releases
+
+Version 1.1.2 Released 9/04/2020
+* Removed extra line in plugin GUI
+* Minor changes in documentation
 
 Version 1.1.1 Released 8/25/2020
 * Removed figure saving from pop_eegbeats
