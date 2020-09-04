@@ -16,20 +16,19 @@ Please cite the following publication if using:
 > [https://biorxiv.org/cgi/content/short/2020.07.21.211862v1](https://biorxiv.org/cgi/content/short/2020.07.21.211862v1)
 
 ### Running EEG-Beats as an EEGLAB plugin:
-1. Install the plug-in through the EEGLAB Extension Manager: 
-         (File -> Manage EEGLAB Extensions)
+1. Install the plugin through the EEGLAB Extension Manager (File -> Manage EEGLAB Extensions)
 
    Alternatively you can directly unzip eegbeats.1.1.2.zip in the EEGLAB
-   plugins directory.
+   plugins directory.  
 2. Load an EEG .set file into EEGLAB
-3. Run EEG-Beats through the EEGLAB Tools menu.
+3. Run EEG-Beats through the EEGLAB Tools menu.  
 
 ### Running EEG-Beats on the command line:
 
-1. Install EEG-Beats as above.
-2. EEG-Beats is designed to be run in two stages: 
-   a. Extract the heartbeats from the EEG 
-   b. Compute RR measures from the heartbeats.  
+1. Install EEG-Beats as above.  
+2. EEG-Beats is designed to be run in two stages:  
+   a. Extract the heartbeats from the EEG  
+   b. Compute RR measures from the heartbeats.   
 
 ### Top-level functions
 EEG-Beats has four top level functions:
