@@ -35,7 +35,7 @@ You can install EEG-Beats as an EEGLAB plugin by installing through the EEGLAB. 
 
 #### Video Tutorial using EEG-Beats as a EEGLAB plugin
 [![Image](https://raw.githubusercontent.com/VisLab/EEG-Beats/gh-pages/YoutubeThumbnail3.png)](https://youtu.be/rQLI58qfqiU)
-[![Image](https://raw.githubusercontent.com/nthanapaisal/EEG-Beats/gh-pages/Images/YoutubeThumbnail3.png)](https://youtu.be/rQLI58qfqiU)
+
 
 
 ___
