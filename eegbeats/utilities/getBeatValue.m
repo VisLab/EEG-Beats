@@ -12,7 +12,7 @@ function [beatValue, troughValue] = getBeatValue(signal, beatFrame, qrsHalfFrame
 %
 %% Compute the correct peak position if a valid peak
     if singlePeak
-        beatValue = getTwoSidedValue(signal, beatFrame, threshold, qrsHalfFrames);
+        beatValue = getTwoSidedValue(signal, beatFrame, qrsHalfFrames, threshold);
         troughValue = [];
     else
         rightPart = round(beatFrame:min(beatFrame + 2*qrsHalfFrames, length(signal)));

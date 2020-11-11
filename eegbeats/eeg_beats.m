@@ -44,11 +44,12 @@ function [ekgPeaks, params, hFig1, hFig2, hFig3, hFig4] = eeg_beats(EEG, params)
     ekgPeaks.ekg = EEG.data;
 
     % Calculate the heart beats for two different methods
+    [peakFramesSingle, flipSingle,sigRightSingle] = getPeakFrames(EEG.data, true, params);
     [peakFrames, flip, sigRight] = getPeakFrames(EEG.data, false, params);
-    peakSingleFrames = getPeakFrames(EEG.data, true, params);
+    
     baseString = sprintf('Initially: peak-trough:%d, single-peak:%d, intersect:%d, flip:%d, sigRight:%d', ...
-            length(peakFrames), length(peakSingleFrames), ...
-            length(intersect(peakFrames, peakSingleFrames)), flip, sigRight);
+            length(peakFrames), length(peakFramesSingle), ...
+            length(intersect(peakFrames, peakFramesSingle)), flip, sigRight);
     fprintf('%s\n', baseString);
    
     ekg = EEG.data - median(EEG.data);
@@ -58,16 +59,16 @@ function [ekgPeaks, params, hFig1, hFig2, hFig3, hFig4] = eeg_beats(EEG, params)
     
     %% Perform alignment of nearby peaks from two methods
     minRRFrames = round(params.rrMinMs.*params.srate./1000.0);
-    [peakFrames, peakSingleFrames] = alignMethodFrames(ekg, peakFrames, peakSingleFrames, minRRFrames);
+    [peakFrames, peakFramesSingle] = alignMethodFrames(ekg, peakFrames, peakFramesSingle, minRRFrames);
      if params.verbose
         fprintf('----after alignment: peak-trough:%d, two-sided:%d, intersect:%d\n', ...
-            length(peakFrames), length(peakSingleFrames), length(intersect(peakFrames, peakSingleFrames)));
+            length(peakFrames), length(peakFramesSingle), length(intersect(peakFrames, peakFramesSingle)));
      end
     
     %% Remove extra peaks in each representation individually
     
     peakFramesReduced = removeExtraPeaks(ekg, peakFrames, params);
-    peakSingleFramesReduced = removeExtraPeaks(ekg, peakSingleFrames, params);
+    peakSingleFramesReduced = removeExtraPeaks(ekg, peakFramesSingle, params);
     if params.verbose
         fprintf('----after removal: peak-trough:%d, two-sided:%d, intersect:%d\n', ...
             length(peakFramesReduced), length(peakSingleFramesReduced), ...
@@ -100,8 +101,8 @@ function [ekgPeaks, params, hFig1, hFig2, hFig3, hFig4] = eeg_beats(EEG, params)
     if params.doPlot 
         baseString = sprintf(['peak-trough:%d, single:%d, ' ...
             'intersect:%d, combined: %d, cleaned: %d, unmatched: %d, flip:%d, sigRight:%d'], ...
-            length(peakFrames), length(peakSingleFrames), ...
-            length(intersect(peakFrames, peakSingleFrames)), ...
+            length(peakFrames), length(peakFramesSingle), ...
+            length(intersect(peakFrames, peakFramesSingle)), ...
             length(peaksCombined),  length(peaksCombinedFinal), ...
             length(peaksRest), flip, sigRight);
         hFig1 = makePeakPlot(ekgPeaks, baseString, params);

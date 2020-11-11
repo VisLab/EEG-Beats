@@ -12,7 +12,7 @@
 %% Set up variables
 % Use initialParseIBI to find a preliminary estimate of the peaks.
 % minimum qrs duration is how wide the peak should be
-peakFrames = []; sigRight = -1;
+peakFrames = [];
 qrsHalfFrames = round(0.5*params.qrsDurationMs*params.srate./1000);
 ekg = ekg - median(ekg);
 ekgAll = ekg;
